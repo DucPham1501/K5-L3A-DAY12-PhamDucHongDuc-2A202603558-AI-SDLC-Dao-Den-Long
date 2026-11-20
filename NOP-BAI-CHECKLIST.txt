@@ -21,29 +21,26 @@ A. ĐÃ CHUẨN BỊ VÀ KIỂM TRA LOCAL
 Chi tiết tự động: docs/submission-audit.json và docs/submission-smoke.json.
 Kiểm chứng gameplay: docs/proof/phase-4/verification.json và browser-qa.json.
 
-B. GITHUB CẦN CHỐT
-Kết quả kiểm tra remote khi chuẩn bị hồ sơ:
+B. GITHUB ĐÃ CHỐT
+Kết quả đã xác nhận trực tiếp trên GitHub:
 - Repo Public: đã xác nhận bằng GitHub API không đăng nhập.
-- main remote: 63e4cc44e94a06147453943408887196ffa232dc.
-- Tag remote: mới có phase-1; phase-2/3/4 hiện có ở local, cần push đúng tag cũ.
-- Chưa có GitHub Release; cần tạo v1.0.0 với ZIP chạy được.
-- CI của commit Phase 4 cũ đã success; CI bản bổ sung chưa xác nhận.
-- GitHub CLI báo token không hợp lệ. Người dùng cần tự đăng nhập lại:
-
-gh auth login -h github.com
+- Commit bản nộp e8881bf9a5840334363f879cf856557651e5089e đã push lên main.
+- Đã có đủ tag phase-1, phase-2, phase-3, phase-4, giữ nguyên commit ban đầu.
+- Release v1.0.0 đã public tại:
+  https://github.com/DucPham1501/K5-L3A-DAY12-PhamDucHongDuc-2A202603558-AI-SDLC-Dao-Den-Long/releases/tag/v1.0.0
+- Release đính kèm dao-den-long-v1.0.0.zip và demo.mp4, cả hai uploaded.
+- Repo, link tải video và ZIP đều HTTP 200 khi không đăng nhập.
+- CI của commit bản nộp đã completed/success:
+  https://github.com/DucPham1501/K5-L3A-DAY12-PhamDucHongDuc-2A202603558-AI-SDLC-Dao-Den-Long/actions/runs/44782726611
+- Lỗi token thiếu quyền Contents/Workflows đã xử lý sau khi người dùng cấp quyền.
 
 Không gửi mật khẩu, mã truy cập hoặc token vào chat.
 Không di chuyển/xóa tag cũ, không giả mạo thời gian commit.
 
-Sau khi đăng nhập, quy trình còn lại:
-1. Commit các thay đổi bàn giao và video đã nén; không commit game_demo.mp4 gốc.
-2. Push main và các tag local phase-2, phase-3, phase-4.
-3. Tạo Release v1.0.0 ở commit bản bàn giao, đính kèm:
-   - release/dao-den-long-v1.0.0.zip
-   - docs/demo/demo.mp4 (tùy chọn thêm vào Release; đã có bản trong repo).
-4. Đợi GitHub Actions của commit mới chạy xong và xác nhận success.
-5. Mở repo, Tags, Release, link video ở đầu README khi chưa đăng nhập.
-6. Gửi link repo Public lên LMS và kiểm tra LMS ghi nhận nộp thành công.
+VIỆC NGƯỜI LÀM BÀI CÒN CẦN LÀM:
+1. Gửi link repo Public ở đầu file này lên LMS theo thông báo của Coach.
+2. Kiểm tra LMS ghi nhận nộp thành công; nên giữ ảnh xác nhận.
+3. Nếu có điều kiện, nhờ một người review độc lập chơi thử.
 
 C. HẠN VÀ CÁC MỤC KHÔNG THỂ TỰ NHẬN ĐÃ XONG
 - Theo SUBMISSION.md, ca chiều mặc định nộp link trước 11:59 trưa hôm sau;
