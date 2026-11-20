@@ -1,0 +1,47 @@
+{
+  "passed": true,
+  "generated_at": "2026-11-20T10:03:09.866Z",
+  "browser": "157.0.4341.60",
+  "cpu": "AMD Ryzen 7 6800H with Radeon Graphics         ",
+  "viewport": "1280x720",
+  "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001681) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "checks": [
+    "pause tick/sim_tick, settings, blue shade accents and retry UI",
+    "Night 1 map and movement; screenshot captured. Normal starting world.",
+    "Night 2 map and movement; screenshot captured. Start-night-only fixture, production gameplay unchanged.",
+    "Night 3 map and movement; screenshot captured. Start-night-only fixture, production gameplay unchanged.",
+    "volume, sensitivity and accessible setting persist across page opens",
+    "20s fuel fixture: torn/collapsed unlit lamp, relight restores shape/bar, 1Hz low-fuel opacity, capacity HUD and white warning icon",
+    "0.1s all-lit scenario reaches dawn (not early victory), verifies campaign totals; not a manual gameplay victory",
+    "0.1s dawn scenario fixture: losing and retrying same night never adds campaign score"
+  ],
+  "page_errors": [],
+  "fps": [
+    {
+      "night": 1,
+      "fps": 165.0283704947101,
+      "frames": 413,
+      "elapsed_ms": 2502.5999999996275,
+      "shades": 2,
+      "draw_calls": 39
+    },
+    {
+      "night": 2,
+      "fps": 165.01518299499642,
+      "frames": 413,
+      "elapsed_ms": 2502.800000000745,
+      "shades": 2,
+      "draw_calls": 40
+    },
+    {
+      "night": 3,
+      "fps": 164.2488910202614,
+      "frames": 411,
+      "elapsed_ms": 2502.2999999999993,
+      "shades": 2,
+      "draw_calls": 43
+    }
+  ],
+  "meets_30fps": true,
+  "notes": "FPS is RAF sample on this environment; inspect GPU renderer. Fixtures explicitly identified above."
+}

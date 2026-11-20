@@ -1,10 +1,8 @@
-# Đảo Đèn Lồng · Ba hòn đảo
+# Đảo Đèn Lồng · Đèn cạn dầu
 
-Game 3D góc nhìn thứ ba theo **Ticket-02 · Phase 2 · Test Contract v1.1**. Cùng Mây gom đom đóm, thắp đèn và đi qua Đảo Bến, Đảo Cau, Đảo Chuông để đón Bình Minh.
+Game 3D góc nhìn thứ ba · **Phase 3 · Ticket-03 · Test Contract v1.2**. Cùng Mây gom đom đóm, châm dầu và giữ đủ đèn sáng tới Bình Minh. Thắp hết đèn không còn kết thúc sớm.
 
-Phase 1 được giữ nguyên ở tag [`phase-1`](https://github.com/DucPham1501/K5-L3A-DAY12-PhamDucHongDuc-2A202603558-AI-SDLC-Dao-Den-Long/tree/phase-1). Hướng dẫn lab gốc: [LAB.md](LAB.md).
-
-Hồ sơ nộp Phase 2: [checklist và bản đồ bằng chứng](docs/submission-phase-2.md).
+Các bản trước được giữ ở tag `phase-1`, `phase-2`. Tài liệu lab gốc: [LAB.md](LAB.md). Hồ sơ Phase 3: [checklist bàn giao](docs/submission-phase-3.md), [spec và kiểm chứng](docs/notes/phase-3.md), [ADR](docs/decisions/ADR-003-lantern-fuel-and-dawn.md), [breaking changes](CHANGELOG.md).
 
 ## Chạy game — 3 lệnh
 
@@ -16,93 +14,80 @@ npm run build
 npm start
 ```
 
-Mở **http://127.0.0.1:4173**. Bản build `dist/` là web tĩnh, có Three.js và giấy phép đi kèm; không dùng CDN. Chế độ headless không cần trình duyệt hay GPU.
+Mở **http://127.0.0.1:4173**. `dist/` là web tĩnh độc lập, có Three.js và giấy phép đi kèm, không dùng CDN. Headless không cần trình duyệt/GPU.
 
-## Điều khiển
+## Điều khiển và cài đặt
 
 | Phím | Hành động |
 |---|---|
 | WASD | Di chuyển theo camera |
-| Space | Nhảy khi chạm đất |
-| Shift | Lướt; trên không giữ độ cao |
-| E | Nạp vào đèn chưa sáng gần nhất |
+| Space | Nhảy |
+| Shift | Lướt |
+| E | Nạp, thắp lại hoặc châm dầu vào đèn nhận được gần nhất |
 | Q | Tỏa sáng |
 | ← / → hoặc kéo chuột | Xoay camera |
 | Esc / P | Tạm dừng / tiếp tục |
 
-Menu pause có Tiếp tục, Chơi lại Đêm, Cài đặt và Về menu. Âm lượng/độ nhạy chuột được lưu trong trình duyệt. Nhạc và hiệu ứng được tổng hợp bằng Web Audio sau thao tác bắt đầu của người chơi.
+Pause có Tiếp tục, Chơi lại Đêm, Cài đặt, Về menu. Âm lượng, độ nhạy và **Bảng màu dễ phân biệt** lưu trong trình duyệt. Chế độ màu đổi viền/mắt Bóng Mực sang #00B3FF, cảnh báo sang trắng kèm ⚠. Đèn tắt xẹp 20% và có vết rách; đèn yếu nhấp nháy, phân biệt được không chỉ bằng màu.
 
-## Ba Đêm
+## Giữ đảo sáng tới bình minh
 
-| Đêm | Thời gian | Đèn | Đặc điểm |
-|---|---:|---:|---|
-| 1 · Đảo Bến | 300 s | 5 | Đảo tròn bán kính 40 m |
-| 2 · Đảo Cau | 330 s | 6 | Hai đảo, cầu tre không lan can, hai bục phóng, Bùa Gió và Gió Lạc |
-| 3 · Đảo Chuông | 360 s | 7 | Ba tầng, hai dốc, bục lên tầng cao, tháp chuông và gió mạnh |
+| Đêm | Thời gian | Đèn cần sáng ở tick cuối |
+|---|---:|---:|
+| 1 · Đảo Bến | 240 s | 3/5 |
+| 2 · Đảo Cau | 270 s | 4/6 |
+| 3 · Đảo Chuông | 300 s | 5/7 |
 
-Đi theo trình tự menu → lời Ông Đăng → chơi → kết quả → Đêm tiếp theo. Thắng Đêm 3 mở màn Bình Minh với tổng điểm các Đêm đã thắng. Thua được chơi lại đúng Đêm đó.
+Bản đồ, cầu, bục phóng, tầng/dốc/tháp và gió giữ theo Phase 2. Luồng menu → giới thiệu → chơi → kết quả → Đêm tiếp theo; thắng Đêm 3 mở Bình Minh. Hết Ngọn Lửa luôn thua trước, kể cả tick cuối. Không thắng sớm khi thắp đủ đèn.
 
-Mang tối đa **10** đom đóm. Mỗi đèn cần **10**, được nạp từng phần và giữ lượng dư. Đèn đã sáng tạo vùng an toàn **6 m**. Tỏa sáng tốn **3**, bán kính 3D **5 m**, hồi **3 s**, choáng Bóng Mực **120 tick** và đẩy **4 m trong 15 tick**. Lướt **14 m/s**, kéo dài **12 tick**, hồi **90 tick**, không bất tử. Bùa Gió kéo dài **600 tick**, chạy **7,2 m/s** và lướt không hồi.
+- Sức chứa bắt đầu **10**, tăng **2 mỗi lần thắp thành công** kể cả thắp lại, tối đa **20**. Reset đầu Đêm/retry; scenario đặt sẵn đèn không tính.
+- Thắp lần đầu cần **10** đom đóm, thắp lại cần **5**. Được nạp từng phần, giữ dư.
+- Đèn vừa thắp có **100 dầu**, tự hao **1/giây**. E châm **10 dầu/đom đóm**, dùng `min(carried, ceil((100-fuel)/10))`, không vượt 100. Đèn đầy không được chọn, không event/điểm.
+- Hết dầu: tắt, mất tiến độ nạp, nhớ ever_lit. Đèn **≥30 dầu** có safe zone 6 m; dưới 30 mất safe zone và nhấp nháy 1 Hz.
+- Bóng wander tìm đèn yếu gần nhất; trong 2 m thì drain, hút thêm **5 dầu/giây/con**, cộng dồn. Mây tới trong 6 m khiến nó đuổi; pulse làm choáng và phá hút. Châm lên ≥30 đẩy bóng ra mép vùng an toàn.
+- Pulse giữ chi phí 3, bán kính 3D 5 m, hồi 3 s, choáng 120 tick, đẩy 4 m/15 tick. Dash 14 m/s trong 12 tick, hồi 90 tick, không bất tử. Bùa Gió và Gió Lạc giữ luật Phase 2.
+- Bị chạm mất 1/3 Ngọn Lửa, rơi nửa đom đóm, bất tử 90 tick. Rơi dưới Y=−10 mất toàn bộ đom đóm, chờ 60 tick hồi sinh nếu còn lửa. Đồ rơi tồn tại 480 tick.
 
-Bị Bóng Mực chạm mất 1 trong 3 Ngọn Lửa, rơi `floor(carried/2)` đom đóm và bất tử 90 tick. Rơi dưới Y=−10 bỏ qua bất tử, mất toàn bộ đom đóm, chờ 60 tick để hồi sinh nếu còn lửa. Đồ rơi tồn tại 480 tick. Thắp hết đèn thì thắng; hết lửa luôn thua; nếu còn đèn chưa sáng khi hết giờ thì thua.
+## Điểm v1.2
 
-## Điểm chuẩn
+Nạp/châm: **+5 mỗi đom đóm**; thắp lần đầu **+100**, thắp lại **+40**. Pulse mỗi bóng: tổng **+15** nếu ngay trước đó đang drain, tổng **+5** với trạng thái khác. Chỉ khi thắng: mỗi đèn sáng **+50 + floor(fuel)**, mỗi Ngọn Lửa **+50**. Bỏ thưởng thời gian. Tổng chiến dịch chỉ tính các Đêm thắng, không cộng lặp khi retry.
 
-- **+10 mỗi đom đóm nạp**, không cộng khi nhặt.
-- **+100** mỗi đèn sáng.
-- **+5** mỗi Bóng Mực trúng mỗi pulse, kể cả đang choáng.
-- Thắng cộng **floor(giây còn lại) × 2 + 50 × lửa còn lại**.
-- Tổng chiến dịch chỉ cộng điểm các Đêm đã thắng; retry không cộng lặp.
+Tuning: per_mote=0, per_deposit=5, per_lantern=100, per_relight=40, per_stun=5, per_drain_stun=15, per_second_left=0.
 
-Trong tuning, `score.per_mote=0` là điểm nhặt; `score.per_deposit=10` là điểm nạp.
-
-## Headless v1.1
+## Headless v1.2
 
 ```bash
 node src/headless.mjs --seed 12 --night 2 --ticks 3600 --out night2.jsonl
 ```
 
 ```bash
-node src/headless.mjs --seed 12 --night 2 --scenario tests/scenarios/phase-2/drifter-return.json --inputs tests/scenarios/phase-2/pulse.inputs.json --ticks 150 --snapshot-every 10 --out drifter.jsonl
+node src/headless.mjs --seed 12 --night 1 --scenario tests/scenarios/phase-3/refuel.json --inputs tests/scenarios/phase-3/interact.inputs.json --ticks 60 --out refuel.jsonl
 ```
 
-Hỗ trợ `--night 1|2|3`, seed, scenario, inputs, ticks, out và snapshot-every (mặc định 10). Tick 0 chỉ dựng trạng thái; bước đầu bình thường có `night_start` tick 1. Event đứng trước snapshot cùng tick, `end` luôn cuối. Có thêm snapshot cuối khi lệch chu kỳ. Lỗi scenario/inputs mã 2 và stderr; lỗi khác mã 1; thành công mã 0.
+Hỗ trợ night 1/2/3, seed, scenario, inputs, ticks, out, snapshot-every (mặc định 10). Tick 0 không event, bước đầu bình thường có night_start tick 1; event trước snapshot, end cuối. Input giữ trường giữa frame, nút theo false→true. Pause vẫn tăng tick, dừng sim_tick và mọi bộ đếm, kể cả dầu/hút. Lỗi scenario/inputs mã 2, lỗi khác mã 1, thành công 0.
 
-Input giữ giá trị giữa các frame; jump/interact/pulse/dash/pause theo cạnh false→true. Khi pause, `tick` tăng, `sim_tick` và toàn bộ timer/gameplay đứng yên; snapshot state `paused`. Snapshot có night, wind, player velocity/grounded/invuln/cooldown/charm và đủ mảng motes/drifters/charms. `invuln` là boolean. Mote tự nhiên không có TTL nên `ttl_s=null`; đồ rơi có TTL số giây.
+Snapshot đèn có fuel làm tròn 1 chữ số (đèn tắt 0), ever_lit, relit_count; player có capacity; shade có drain. Scenario thêm fuel/ever_lit, player.successful_lights, shade.target_lantern_id. Event mới refuel, lantern_out, fuel_drain; lantern_lit thêm relight; thắng dùng dawn_survived, bỏ all_lit.
 
-Schema bổ sung và các giả định được ghi tại [spec Phase 2](docs/notes/phase-2.md).
+Dầu tính bằng số nguyên đơn vị 1/60; xử lý hao/hút và tắt trước tương tác. Thưởng floor dùng nhiên liệu chính xác, không dùng snapshot đã làm tròn. Mote random ttl_s=null; invuln snapshot boolean. Xem ADR về các trường hợp biên và giả định schema kế thừa Phase 2.
 
-## Kiểm chứng và bằng chứng
+## Kiểm chứng
 
 ```bash
 npm run verify
 ```
 
-Chạy unit/CLI tests, build, scenario tính năng mới, so replay byte-for-byte và benchmark **đủ 21.600 tick**. Bằng chứng tự sinh ở [docs/proof/phase-2](docs/proof/phase-2/), có hash source. Benchmark dùng scenario bất tử ban đầu để tránh thua sớm; vẫn bật sinh địch tự nhiên.
+Chạy 70 unit/CLI tests, build, scenario dầu/hút/thắp lại và regression, so replay byte-for-byte, benchmark đủ **18.000 tick** Đêm 3. Report có hash source/cấu hình máy. Chỉ ghi [proof Phase 3](docs/proof/phase-3/), không sửa bằng chứng Phase 1–2.
 
 ```bash
 npm run test:browser
 ```
 
-Chạy Edge có sẵn ở 1280×720; có thể đặt `BROWSER_PATH` tới Chromium. QA gồm ba bản đồ, di chuyển, pause/retry, lưu cài đặt, chuỗi Đêm, Bình Minh và đo FPS. Các fixture chọn Đêm bắt đầu / đèn dựng sẵn được ghi rõ trong báo cáo, không được coi là người chơi thắng cả ba Đêm bình thường. `SOFTWARE_WEBGL=1` dành cho máy không có GPU, không dùng số đó thay số đo GPU phần cứng.
+QA Edge 1280×720; `BROWSER_PATH` hỗ trợ Chromium khác, `SOFTWARE_WEBGL=1` cho máy không GPU. Kiểm tra ba bản đồ, pause/retry/cài đặt, màu dễ phân biệt, dầu yếu/thắp lại/HUD và chuyển Đêm. Fixture gần bình minh chỉ kiểm tra luật kết thúc, không giả là lượt chơi thắng cả ba Đêm thường.
 
-Xem [báo cáo logic/headless](docs/proof/phase-2/verification.json), [báo cáo trình duyệt/FPS](docs/proof/phase-2/browser-qa.json), ảnh [Đêm 1](docs/proof/phase-2/night-1.png), [Đêm 2](docs/proof/phase-2/night-2.png), [Đêm 3](docs/proof/phase-2/night-3.png). CI Ubuntu chạy verify mỗi push/PR; trạng thái run GitHub cần được kiểm tra riêng.
+Xem [logic/headless](docs/proof/phase-3/verification.json), [browser/FPS](docs/proof/phase-3/browser-qa.json), ảnh [Đêm 1](docs/proof/phase-3/night-1.png), [dầu trước thắp lại](docs/proof/phase-3/fuel-before-fixture.png), [sau thắp lại](docs/proof/phase-3/fuel-after-fixture.png). CI Ubuntu chạy verify khi push/PR; kết quả từ xa phải kiểm tra riêng.
 
 ## Sáng tạo của tôi
 
-Mô hình nón lá treo đèn, biển mây, tiếng chuông/nhạc tổng hợp, lối đá và minimap đều tạo trong mã. Camera tự tránh địa hình che khuất Mây. Cảnh vật dùng instancing để giảm draw call. Chi tiết trang trí không có collider, không thêm thực thể hay làm đổi headless.
+Nón lá treo đèn, biển mây, lối đá, minimap, âm thanh tổng hợp và camera tránh che Mây. Cảnh dùng instancing; chi tiết trang trí không thay headless. Quầng safe zone mất khi dầu yếu; hình dạng/vết rách và biểu tượng cảnh báo bổ sung thông tin ngoài màu.
 
-## Tổ chức mã
-
-```text
-src/core/game.mjs       Simulation và thứ tự tick
-src/core/maps.mjs       Ba bản đồ, địa hình và vật cản
-src/core/campaign.mjs   Tiến trình/điểm ba Đêm
-src/core/validate.mjs   Kiểm tra dữ liệu đầu vào
-src/headless.mjs        CLI v1.1
-web/                   World, HUD/menu, audio và palette
-tests/                 Regression và scenario Phase 2
-docs/                  Spec, nhật ký và bằng chứng từng phase
-```
-
-Harness: [AGENTS.md](AGENTS.md), verification script và GitHub Actions. Nguồn: [CREDITS.md](CREDITS.md), giấy phép: [LICENSE](LICENSE). Phase 3–4 và Release/video cuối bài chờ ticket tiếp theo.
+Mã simulation/terrain/campaign/validation ở src/core, CLI ở src/headless.mjs; renderer/HUD/audio/palette ở web. Harness: [AGENTS.md](AGENTS.md), verify script và GitHub Actions. Nguồn: [CREDITS.md](CREDITS.md), giấy phép: [LICENSE](LICENSE). Phase 4/Release/video cuối bài chờ ticket.

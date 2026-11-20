@@ -16,9 +16,11 @@ export function validateInputs(data) {
 }
 export function validateScenario(data,t,night=1){
   obj(data,'scenario');keys(data,['player','random_motes','random_shades','random_drifters','wind_enabled','motes','shades','lanterns','drifters','charms','time_left_s'],'scenario');
-  if('player'in data){obj(data.player,'player');keys(data.player,['pos','carried','flames','invuln_ticks','dash_cd_ticks','pulse_cd_ticks','charm_ticks'],'player');
+  if('player'in data){obj(data.player,'player');keys(data.player,['pos','carried','flames','invuln_ticks','dash_cd_ticks','pulse_cd_ticks','charm_ticks','successful_lights'],'player');
     if('pos'in data.player)pos(data.player.pos,'player.pos');
-    for(const k of ['carried','flames','invuln_ticks','dash_cd_ticks','pulse_cd_ticks','charm_ticks'])if(k in data.player)num(data.player[k],k,0,k==='carried'?t.carry_capacity:Number.MAX_SAFE_INTEGER,true);
+    if('successful_lights'in data.player)num(data.player.successful_lights,'successful_lights',0,Number.MAX_SAFE_INTEGER,true);
+    const capacity=Math.min(t.capacity_max,t.carry_capacity+2*(data.player.successful_lights??0));
+    for(const k of ['carried','flames','invuln_ticks','dash_cd_ticks','pulse_cd_ticks','charm_ticks'])if(k in data.player)num(data.player[k],k,0,k==='carried'?capacity:Number.MAX_SAFE_INTEGER,true);
   }
   for(const k of ['random_motes','random_shades','random_drifters','wind_enabled'])if(k in data)bool(data[k],k);
   if('time_left_s'in data)num(data.time_left_s,'time_left_s',0,1e9);
@@ -26,15 +28,17 @@ export function validateScenario(data,t,night=1){
   data.motes?.forEach(p=>pos(p,'mote.pos'));
   for(const type of ['shades','drifters','charms','lanterns']){
     const ids=new Set();for(const v of data[type]??[]){obj(v,type);
-      const allowed=type==='shades'?['id','pos','state','state_ticks_left']:type==='drifters'?['id','pos','state','stolen','state_ticks_left']:type==='charms'?['id','pos','available','respawn_s','respawn_ticks']:['id','pos','lit','deposited'];keys(v,allowed,type);
+      const allowed=type==='shades'?['id','pos','state','state_ticks_left','target_lantern_id']:type==='drifters'?['id','pos','state','stolen','state_ticks_left']:type==='charms'?['id','pos','available','respawn_s','respawn_ticks']:['id','pos','lit','deposited','fuel','ever_lit'];keys(v,allowed,type);
       if('id'in v){if(typeof v.id!=='string'||!v.id||ids.has(v.id))fail(`${type}: invalid/duplicate id`);ids.add(v.id);}
       if(type==='lanterns'&&(!/^L[1-7]$/.test(v.id)||Number(v.id.slice(1))>night+4))fail('invalid lantern id');
       if('pos'in v)pos(v.pos,`${type}.pos`);else if(type==='shades'||type==='drifters')fail(`${type}.pos required`);
-      if('state'in v && !(type==='shades'?['spawning','wander','chase','recoil','stunned']:['idle','chase','flee','removed']).includes(v.state))fail('invalid state');
+      if('state'in v && !(type==='shades'?['spawning','wander','chase','recoil','stunned','drain']:['idle','chase','flee','removed']).includes(v.state))fail('invalid state');
+      if('target_lantern_id'in v&&(!/^L[1-7]$/.test(v.target_lantern_id)||Number(v.target_lantern_id.slice(1))>night+4))fail('invalid target_lantern_id');
+      if('fuel'in v)num(v.fuel,'fuel',0,t.fuel_max);
       for(const k of ['state_ticks_left','stolen','respawn_ticks'])if(k in v)num(v[k],k,0,Number.MAX_SAFE_INTEGER,true);
       if('respawn_s'in v)num(v.respawn_s,'respawn_s',0,1e9);
       if('deposited'in v)num(v.deposited,'deposited',0,t.lantern_cost,true);
-      for(const k of ['lit','available'])if(k in v)bool(v[k],k);
+      for(const k of ['lit','available','ever_lit'])if(k in v)bool(v[k],k);
       if(type==='charms'&&(!v.id||(!v.pos&&!['C1','C2'].includes(v.id))))fail('charm requires known id or pos');
     }
   }return data;

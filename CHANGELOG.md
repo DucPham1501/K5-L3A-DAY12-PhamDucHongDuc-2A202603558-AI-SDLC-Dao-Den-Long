@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.0 — Phase 3: Đèn cạn dầu
+
+### Breaking changes
+
+- Contract 1.1 → 1.2. Thời lượng Đêm 300/330/360 → 240/270/300 giây.
+- Bỏ thắng sớm all_lit; chỉ thắng tại bình minh với ceil(60% số đèn) sáng, reason dawn_survived. Hết lửa ưu tiên tuyệt đối.
+- Đèn sáng vẫn nhận đom đóm để châm dầu, đèn đầy không được chọn. Đèn hết dầu tắt/reset deposited nhưng nhớ ever_lit; thắp lại tốn 5 thay vì 10.
+- Dầu 100, tự hao 1/s; dưới 30 mất safe zone. Wander ưu tiên đèn yếu, shade có drain hút 5/s cộng dồn. Đây thay luật bóng luôn bị đèn sáng chặn.
+- Sức chứa cố định 10 → min(20,10+2×successful_lights); reset đầu Đêm, chỉ gameplay light/relight làm tăng.
+- Thay toàn bộ điểm Phase 2: nạp/châm +5, lần đầu +100, relight +40, pulse drain tổng +15/khác +5, dawn thưởng đèn/fuel/lửa; bỏ thưởng thời gian.
+- Snapshot/scenario/event mở rộng theo v1.2. Fixture thắng sớm chuyển thành fixture bình minh; kỳ vọng thời gian/điểm cũ cập nhật có lý do trong ADR/spec, không skip test.
+
+### Hiển thị và kiểm chứng
+
+- Thanh dầu, cảnh báo 1 Hz, đèn tắt xẹp/rách; chế độ Bảng màu dễ phân biệt lưu giữa các lần mở, viền/mắt xanh và cảnh báo trắng có ⚠.
+- HUD sức chứa động, hướng dẫn mục tiêu mới, hàng đợi cho phím nhấn ngắn giữa hai tick render.
+- ADR-003, 70 tests, scenario dầu/hút/thắp lại/dawn, replay tất định, benchmark và browser QA riêng Phase 3. Các bản/bằng chứng trước giữ nguyên.
+
 ## 0.2.0 — Phase 2
 
 - Chuẩn hóa số liệu, bản đồ và Test Contract v1.1; hỗ trợ ba Đêm.
