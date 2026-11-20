@@ -5,6 +5,8 @@ if (!existsSync(at('node_modules/three/build/three.module.js'))) throw new Error
 mkdirSync(at('dist/vendor'), { recursive: true });
 copyFileSync(at('index.html'), at('dist/index.html'));
 copyFileSync(at('game.contract.json'), at('dist/game.contract.json'));
+copyFileSync(at('LICENSE'), at('dist/LICENSE.txt'));
+copyFileSync(at('CREDITS.md'), at('dist/CREDITS.md'));
 cpSync(at('web'), at('dist/web'), { recursive: true });
 cpSync(at('src/core'), at('dist/src/core'), { recursive: true });
 copyFileSync(at('node_modules/three/build/three.module.js'), at('dist/vendor/three.module.js'));

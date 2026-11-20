@@ -1,16 +1,20 @@
 {
   "name": "dao-den-long",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Đảo Đèn Lồng — survive until dawn, Test Contract v1.2",
+  "description": "Đảo Đèn Lồng — survive until dawn, Test Contract v1.3 (v1.0.0 release)",
   "scripts": {
     "start": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
     "headless": "node src/headless.mjs",
     "test": "node --test",
     "verify": "node scripts/verify.mjs",
-    "test:browser": "node scripts/browser-qa.mjs"
+    "test:browser": "node scripts/browser-qa.mjs",
+    "bench": "node scripts/bench.mjs --seed 42 --duration 30 --out bench.json",
+    "soak": "node --expose-gc --max-semi-space-size=1 --no-opt scripts/soak.mjs --seed 7 --nights 10 --out soak.json",
+    "export-leaderboard": "node scripts/serve.mjs --export-leaderboard leaderboard.json",
+    "package": "node scripts/package.mjs"
   },
   "dependencies": {
     "three": "0.170.0"

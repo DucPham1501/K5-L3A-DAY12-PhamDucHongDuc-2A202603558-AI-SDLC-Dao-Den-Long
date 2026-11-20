@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.0.0 — Phase 4: Bình minh, phát hành
+
+### Contract v1.3
+
+- `contract_version` 1.2 → 1.3; thêm `bench_cmd` (`node scripts/bench.mjs`) và `soak_cmd` (`node --expose-gc --max-semi-space-size=1 --no-opt scripts/soak.mjs`).
+- `run_cmd` đổi từ `npm start` sang lệnh tương đương `node scripts/serve.mjs`, để `--export-leaderboard out.json` được chuyển thẳng vào script (npm sẽ nuốt cờ lạ nếu thiếu `--`). `npm start` vẫn chạy được.
+- Luật chơi, tuning, headless, JSONL và mã thoát của v1.0–v1.2 giữ nguyên. Không có breaking change cho gameplay.
+
+### Mới
+
+- Benchmark chuẩn: cửa sổ 1280×720, tắt vsync, cảnh Đêm 1 với 200 Bóng Mực wander, 100 đom đóm, L1–L3 fuel 100, camera bay vòng 30 m/15 s ngược chiều kim đồng hồ. Đo avg_fps, p1_low_fps, p95, load_ms từ lúc tiến trình bắt đầu, và RAM đỉnh của cây tiến trình trình duyệt.
+- Soak 10 Đêm trong một tiến trình với input ngẫu nhiên theo seed; đo RSS lúc đầu và lúc cuối.
+- Bảng xếp hạng cục bộ lưu trên đĩa: nhập tên sau Bình Minh hoặc sau khi thua, top 10, có màn hình riêng từ menu, CLI `--export-leaderboard`, nhận tên tiếng Việt có dấu.
+- Accessibility: đổi phím cho 9 hành động (báo trùng phím, khôi phục mặc định, có lưu); phụ đề và mũi tên mép màn hình cho Bóng Mực mới; cảnh báo gió, 10 giây cuối và đèn dưới 30 dầu; chế độ giảm chuyển động; chữ UI tối thiểu 18 px và tùy chọn chữ lớn ×1,25.
+- Rung camera và chớp màn hình khi trúng đòn (hiệu ứng thuần hình ảnh, tắt bằng Giảm chuyển động).
+- Đóng gói release `dao-den-long-v1.0.0.zip` (`npm run package`), chỉ cần Node để chạy.
+- 11 test mới (tổng 81). `verify` và browser QA giờ ghi vào `docs/proof/phase-4`; proof Phase 1–3 giữ nguyên.
+
+### Thay đổi khác
+
+- Phím tạm dừng mặc định chỉ còn Esc (trước đây có cả P), vì mọi hành động đều đổi được phím; P vẫn gán lại được.
+- HUD được bố trí lại cho chữ ≥18 px: bỏ chú giải minimap và các dòng chú thích nhỏ.
+
 ## 0.3.0 — Phase 3: Đèn cạn dầu
 
 ### Breaking changes

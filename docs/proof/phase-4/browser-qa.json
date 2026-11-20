@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "generated_at": "2026-11-20T10:49:47.326Z",
+  "browser": "157.0.4341.60",
+  "cpu": "AMD Ryzen 7 6800H with Radeon Graphics         ",
+  "viewport": "1280x720",
+  "gpu": "ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001681) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "checks": [
+    "Night 1 natural spawn at sim_tick 300: caption \"Bóng Mực xuất hiện\" + 2 direction arrow(s) (edge: true,true); all HUD text ≥18px, panels inside 1280×720 without overlap",
+    "pause tick/sim_tick, settings, blue shade accents and retry UI",
+    "Night 1 map and movement; screenshot captured.",
+    "Night 2 map and movement; screenshot captured.",
+    "Night 3 map and movement; screenshot captured.",
+    "volume, sensitivity and accessible setting persist across page opens",
+    "rebinding all 9 actions available; duplicate key E for Jump reported and rejected; J/I/P assigned, persisted across reload, drive jump/forward/pause in game; \"Khôi phục mặc định\" restores defaults",
+    "\"Chữ lớn\" scales every visible text to ≥22.5px (18×1.25) on menu, settings and HUD; HUD stays inside viewport (overlaps: none). Reduced motion hides the screen flash layer",
+    "20s fuel fixture: torn/collapsed unlit lamp, relight restores shape/bar, 1Hz low-fuel opacity, capacity HUD, caption \"L2 sắp cạn dầu\" + HUD low-fuel list; with reduced motion the lamp does not blink and shows ⚠ instead",
+    "time_left 11.5 s fixture: caption \"10 giây cuối\" and boxed red clock at ≤10 s",
+    "Night 3 (no enemies fixture) at sim_tick 1680: caption \"Gió mạnh sắp thổi\" + HUD wind status",
+    "dawn fixture (0.1 s, preset lamps) reaches Bình Minh, total 3132 = sum of won nights, 3/3 nights; name form saves \"Bình_Minh\" (Vietnamese name) at rank 1",
+    "loss fixture: name \"ab\" rejected with message, \"QA_Tester\" saved (score 0, 0 nights); retry adds no score; reopened page → menu \"Bảng xếp hạng\" lists both in order; CLI --export-leaderboard reads the same disk file in the same order"
+  ],
+  "page_errors": [],
+  "fps": [
+    {
+      "night": 1,
+      "fps": 165.08774033657107,
+      "frames": 413,
+      "elapsed_ms": 2501.7000000000007,
+      "shades": 2,
+      "draw_calls": 39
+    },
+    {
+      "night": 2,
+      "fps": 165.10753977769988,
+      "frames": 413,
+      "elapsed_ms": 2501.4000000003725,
+      "shades": 2,
+      "draw_calls": 40
+    },
+    {
+      "night": 3,
+      "fps": 165.00199760290113,
+      "frames": 413,
+      "elapsed_ms": 2502.999999999627,
+      "shades": 2,
+      "draw_calls": 43
+    }
+  ],
+  "meets_30fps": true,
+  "notes": "Headless QA (not the windowed benchmark). Fixtures are marked; they test UI/rules, not a manual three-night victory. Leaderboard used a temporary LANTERN_DATA_DIR."
+}

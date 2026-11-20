@@ -1,0 +1,13 @@
+{
+  "contract_version": "1.3",
+  "avg_fps": 188.17,
+  "p1_low_fps": 84.12,
+  "frame_ms_p95": 9.6,
+  "frames": 5646,
+  "load_ms": 2047,
+  "peak_mem_mb": 675.7,
+  "vsync_off": true,
+  "renderer": "Three.js 0.170.0 / WebGL2 / chromium 157.0.4341.60 (ANGLE (AMD, AMD Radeon(TM) Graphics (0x00001681) Direct3D11 vs_5_0 ps_5_0, D3D11))",
+  "os": "Windows_NT 10.0.26300 x64 · AMD Ryzen 7 6800H with Radeon Graphics · 15 GB RAM",
+  "measurement_ms": 30005.1
+}

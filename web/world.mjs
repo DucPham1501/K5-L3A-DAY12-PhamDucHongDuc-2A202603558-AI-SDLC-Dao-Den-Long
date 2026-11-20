@@ -62,15 +62,15 @@ export class World{
     this.dynamic.add(group);const visual={group,body,edge,fuelBar,fuelFill,fuelWarning,tear,accents};this.visuals.set(`${type}:${item.id}`,visual);return visual;
   }
   pulse(pos){const ring=this.ring(this.dynamic,1,P.core,0);ring.position.set(pos[0],pos[1]+.05,pos[2]);this.pulses.push({ring,age:0});}
-  update(game,yaw,delta,active){
+  update(game,yaw,delta,active,benchmarkTime=null){
     this.time+=delta;const p=game.player;this.ambient.intensity=.15+.55*game.lanterns.filter(l=>l.lit).length/game.lanterns.length;
-    this.avatar.position.set(...p.pos);this.avatar.rotation.y=Math.atan2(game.facing[0],game.facing[1]);this.avatar.visible=!game.respawnTicks&&!(game.invulnTicks>0&&Math.floor(this.time*10)%2);
+    this.avatar.position.set(...p.pos);this.avatar.rotation.y=Math.atan2(game.facing[0],game.facing[1]);this.avatar.visible=!game.respawnTicks&&!(!this.reducedMotion&&game.invulnTicks>0&&Math.floor(this.time*10)%2);
     this.handLamp.rotation.z=Math.sin(this.time*6)*.1;this.legs.forEach((leg,i)=>leg.rotation.x=active&&Math.hypot(p.vel[0],p.vel[2])>.1?Math.sin(this.time*13+i*Math.PI)*.6:0);
     this.windLeaves.visible=game.wind.warning||game.wind.active;
     if(this.windLeaves.visible){const m=new THREE.Matrix4(),q=new THREE.Quaternion(),a=game.wind.dir_deg*Math.PI/180;for(let i=0;i<16;i++){const travel=(this.time*4+i*.8)%12-6;q.setFromEuler(new THREE.Euler(this.time+i,this.time*.5,1));m.compose(new THREE.Vector3(p.pos[0]+Math.cos(a)*travel+Math.sin(i)*3,p.pos[1]+1+Math.sin(this.time*2+i),p.pos[2]+Math.sin(a)*travel+Math.cos(i)*3),q,new THREE.Vector3(1,1,1));this.windLeaves.setMatrixAt(i,m);}this.windLeaves.instanceMatrix.needsUpdate=true;}
     const seen=new Set();for(const[type,list]of[['lamp',game.lanterns],['shade',game.shades],['drifter',game.drifters],['charm',game.charms]])for(const item of list){const key=`${type}:${item.id}`;seen.add(key);const v=this.visuals.get(key)??this.make(type,item);v.group.position.set(...item.pos);
-      if(type==='lamp'){const low=item.lit&&item.fuel<30,blink=low&&game.simTick%60>=30?.3:1;v.body.material.color.set(item.lit?P.lit:P.unlit);v.body.scale.y=item.lit?1:.8;v.body.material.opacity=blink;v.tear.visible=!item.lit;v.tear.scale.y=item.lit?1:.8;v.edge.visible=game.safeLantern(item);v.edge.material.opacity=.3;v.fuelBar.visible=item.lit;v.fuelBar.quaternion.copy(this.camera.quaternion);v.fuelFill.scale.x=item.fuel/100;v.fuelFill.position.x=-.6+.6*item.fuel/100;v.fuelFill.material.opacity=blink;v.fuelFill.material.color.set(low?(this.accessible?'#FFFFFF':P.danger):P.gold);}
-      if(type==='lamp')v.fuelWarning.visible=item.lit&&item.fuel<30&&this.accessible;
+      if(type==='lamp'){const low=item.lit&&item.fuel<30,blink=low&&!this.reducedMotion&&game.simTick%60>=30?.3:1;v.body.material.color.set(item.lit?P.lit:P.unlit);v.body.scale.y=item.lit?1:.8;v.body.material.opacity=blink;v.tear.visible=!item.lit;v.tear.scale.y=item.lit?1:.8;v.edge.visible=game.safeLantern(item);v.edge.material.opacity=.3;v.fuelBar.visible=item.lit;v.fuelBar.quaternion.copy(this.camera.quaternion);v.fuelFill.scale.x=item.fuel/100;v.fuelFill.position.x=-.6+.6*item.fuel/100;v.fuelFill.material.opacity=blink;v.fuelFill.material.color.set(low?(this.accessible?'#FFFFFF':P.danger):P.gold);}
+      if(type==='lamp')v.fuelWarning.visible=item.lit&&item.fuel<30&&(this.accessible||this.reducedMotion);
       if(type==='shade'){v.body.material.color.set(item.state==='stunned'?P.stunned:P.shade);for(const accent of v.accents)accent.material.color.set(this.accessible?'#00B3FF':P.outline);v.group.scale.setScalar(item.state==='spawning'?Math.max(.05,1-item.stateTicks/60):1);v.group.rotation.y=Math.atan2(p.pos[0]-item.pos[0],p.pos[2]-item.pos[2]);}
       if(type==='drifter')v.group.rotation.y=this.time*2;
       if(type==='charm'){v.group.visible=item.available;v.group.rotation.y=this.time;}
@@ -83,9 +83,15 @@ export class World{
     for(let i=this.pulses.length-1;i>=0;i--){const v=this.pulses[i];v.age+=delta;v.ring.scale.setScalar(v.age*10+.1);v.ring.material.opacity=Math.max(0,1-v.age*2);if(v.age>.5){this.dynamic.remove(v.ring);v.ring.geometry.dispose();v.ring.material.dispose();this.pulses.splice(i,1);}}
     const a=yaw*Math.PI/180,target=new THREE.Vector3(p.pos[0],p.pos[1]+1,p.pos[2]),wanted=new THREE.Vector3(p.pos[0]+Math.sin(a)*15,p.pos[1]+11,p.pos[2]+Math.cos(a)*15);
     for(let i=1;i<=20;i++){const f=i/20,x=target.x+(wanted.x-target.x)*f,z=target.z+(wanted.z-target.z)*f;let h=groundHeight(this.map,x,z);if(this.map.night===3&&Math.hypot(x,z)<2.3)h=15.5;if(Number.isFinite(h))wanted.y=Math.max(wanted.y,target.y+(h+.5-target.y)/f);}
-    this.camera.position.lerp(wanted,1-Math.exp(-delta*7));this.camera.lookAt(target);this.renderer.render(this.scene,this.camera);
+    // Benchmark orbit: radius 30, Y=15, start (30,15,0), counter-clockwise seen from above (+X → −Z), 15 s per lap.
+    if(benchmarkTime!==null){const angle=benchmarkTime*Math.PI*2/15;this.camera.position.set(30*Math.cos(angle),15,-30*Math.sin(angle));this.camera.lookAt(0,0,0);this.renderer.render(this.scene,this.camera);}
+    else{this.camera.position.lerp(wanted,1-Math.exp(-delta*7));this.camera.lookAt(target);
+      // Camera shake on hit is cosmetic only and fully disabled by "Giảm chuyển động".
+      this.shakeTime=Math.max(0,(this.shakeTime??0)-delta);const amount=this.reducedMotion?0:this.shakeTime*.9,offset=new THREE.Vector3(Math.sin(this.time*91)*amount,Math.sin(this.time*77+1)*amount,0);
+      this.camera.position.add(offset);this.renderer.render(this.scene,this.camera);this.camera.position.sub(offset);}
     if(active){this.stats.frames++;this.stats.seconds+=delta;this.stats.average_fps=this.stats.frames/this.stats.seconds;}
   }
-  screenPoint(pos){const p=new THREE.Vector3(pos[0],pos[1]+2,pos[2]).project(this.camera);return{x:p.x,y:p.y,visible:p.z<1&&Math.abs(p.x)<=1&&Math.abs(p.y)<=1};}
+  shake(seconds=.35){if(!this.reducedMotion)this.shakeTime=seconds;}
+  screenPoint(pos,lift=2){const p=new THREE.Vector3(pos[0],pos[1]+lift,pos[2]).project(this.camera);const behind=p.z>1;return{x:behind?-p.x:p.x,y:behind?-p.y:p.y,behind,visible:!behind&&Math.abs(p.x)<=1&&Math.abs(p.y)<=1};}
   describe(){return [...this.visuals].map(([id,v])=>({id,scale_y:v.body?.scale.y,opacity:v.body?.material.opacity,tear:v.tear?.visible,fuel_bar:v.fuelBar?.visible,warning_icon:v.fuelWarning?.visible,fuel_width:v.fuelFill?.scale.x,accent:v.accents[0]?'#'+v.accents[0].material.color.getHexString():undefined}));}
 }

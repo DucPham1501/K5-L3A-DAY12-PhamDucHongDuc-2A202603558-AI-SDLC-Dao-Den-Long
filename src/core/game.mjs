@@ -115,6 +115,14 @@ export class Game{
     for(const d of this.drifters)if(dist3(d.pos,center)<=5+E){if(d.state==='chase'){d.state='flee';d.stateTicks=240;}else if(d.state==='flee'&&d.stolen>0){const amount=d.stolen;this.dropMotes(amount,d.pos,false);d.stolen=0;d.stateTicks=120;this.emit('drifter_drop',{drifter_id:d.id,amount});}}
     this.emit('pulse',{stunned_ids});
   }
+  wander(s){
+    const weak=this.lanterns.filter(l=>l.lit&&l.fuelUnits<this.tuning.low_fuel_threshold*60);const candidates=weak.length?weak:this.lanterns.filter(l=>!l.lit);
+    const target=candidates.sort((a,b)=>distance(s.pos,a.pos)-distance(s.pos,b.pos)||idSort(a,b))[0];s.target_lantern_id=target?.id;
+    if(target?.lit&&distance(s.pos,target.pos)<=2+E){s.state='drain';s.drainTicks=0;return;}
+    const v=target?(distance(s.pos,target.pos)>E?dir(target.pos,s.pos):[0,0]):[Math.cos(this.simTick/180+Number(s.id.replace(/\D/g,''))),Math.sin(this.simTick/180+Number(s.id.replace(/\D/g,'')))];
+    this.moveShade(s,v[0]*DT,v[1]*DT);
+    if(target?.lit&&distance(s.pos,target.pos)<=2+E){s.state='drain';s.drainTicks=0;}
+  }
   enemies(){const p=this.player;
     for(const s of this.shades){if(s.state==='spawning')continue;
       if(s.state==='stunned'){if(s.pushTicks>0){this.moveShade(s,s.pushDir[0]*4/15,s.pushDir[1]*4/15);s.pushTicks--;}continue;}
@@ -123,12 +131,8 @@ export class Game{
       if(s.state==='drain'){const l=this.lanterns.find(l=>l.id===s.target_lantern_id);if(d<=6){s.state='chase';s.drainTicks=0;}else if(!l?.lit||this.safeLantern(l)||distance(s.pos,l.pos)>2+E){s.state='wander';s.drainTicks=0;continue;}else continue;}
       if(s.justRecovered)continue;
       if(s.state==='chase'&&d>18)s.state='wander';else if(s.state==='wander'&&d<=12)s.state='chase';
-      let target;
-      if(s.state==='wander'){const weak=this.lanterns.filter(l=>l.lit&&l.fuelUnits<this.tuning.low_fuel_threshold*60);const candidates=weak.length?weak:this.lanterns.filter(l=>!l.lit);target=candidates.sort((a,b)=>distance(s.pos,a.pos)-distance(s.pos,b.pos)||idSort(a,b))[0];s.target_lantern_id=target?.id;
-        if(target?.lit&&distance(s.pos,target.pos)<=2+E){s.state='drain';s.drainTicks=0;continue;}}
-      const v=s.state==='chase'?(d>E?dir(p.pos,s.pos):[0,0]):target?(distance(s.pos,target.pos)>E?dir(target.pos,s.pos):[0,0]):[Math.cos(this.simTick/180+Number(s.id.replace(/\D/g,''))),Math.sin(this.simTick/180+Number(s.id.replace(/\D/g,'')))];
-      const speed=s.state==='chase'?(this.night===3?4.5:4):1;this.moveShade(s,v[0]*speed*DT,v[1]*speed*DT);
-      if(s.state==='wander'&&target?.lit&&distance(s.pos,target.pos)<=2+E){s.state='drain';s.drainTicks=0;}
+      if(s.state==='wander'){this.wander(s);continue;}
+      const v=d>E?dir(p.pos,s.pos):[0,0],speed=this.night===3?4.5:4;this.moveShade(s,v[0]*speed*DT,v[1]*speed*DT);
     }
     for(const d of this.drifters){if(d.born===this.simTick)continue;const delta=distance(p.pos,d.pos);
       if(d.state!=='flee')d.state=p.carried>=5&&delta<=15?'chase':'idle';

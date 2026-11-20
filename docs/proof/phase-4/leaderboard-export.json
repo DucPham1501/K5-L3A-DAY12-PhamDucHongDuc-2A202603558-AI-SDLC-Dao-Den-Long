@@ -1,0 +1,25 @@
+{
+  "entries": [
+    {
+      "name": "Dawn",
+      "score": 1800,
+      "nights_won": 3,
+      "achieved_at": "2026-11-20T17:05:00.000+07:00",
+      "seed": 12
+    },
+    {
+      "name": "Mây_01",
+      "score": 420,
+      "nights_won": 1,
+      "achieved_at": "2026-11-20T17:00:00.000+07:00",
+      "seed": 12
+    },
+    {
+      "name": "Tie_late",
+      "score": 420,
+      "nights_won": 1,
+      "achieved_at": "2026-11-20T17:09:00.000+07:00",
+      "seed": 12
+    }
+  ]
+}

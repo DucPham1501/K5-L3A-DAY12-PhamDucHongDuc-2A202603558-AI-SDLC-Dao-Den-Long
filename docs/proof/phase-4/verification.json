@@ -1,0 +1,556 @@
+{
+  "passed": true,
+  "generated_at": "2026-11-20T10:56:28.041Z",
+  "node": "v20.17.0",
+  "platform": "win32",
+  "cpu": "AMD Ryzen 7 6800H with Radeon Graphics         ",
+  "determinism": {
+    "identical": true,
+    "sha256": "e4d3dac3858e5ad1c05967271caec8c0c46f3d180c770bb52e6a9bbe39e5567c"
+  },
+  "headless_18000_ticks_ms": 1087,
+  "benchmark_scenario": "Full Night 3 v1.2, natural enemies enabled; initial invulnerability avoids early death, wind disabled to hold position",
+  "contract_version": "1.3",
+  "soak": {
+    "nights": 10,
+    "crashes": 0,
+    "results": [
+      "lost",
+      "lost",
+      "lost",
+      "lost",
+      "lost",
+      "lost",
+      "lost",
+      "lost",
+      "lost",
+      "lost"
+    ],
+    "mem_start_mb": 34.63671875,
+    "mem_end_mb": 37.4765625,
+    "duration_s": 3.0191782000000003
+  },
+  "soak_ms": 3114,
+  "leaderboard_export": "3 seeded entries in a temp LANTERN_DATA_DIR exported in rank order (score desc, tie → earlier first)",
+  "browser_bench": "Run separately: npm run bench (needs a desktop browser window); result committed as bench.json",
+  "source_sha256": {
+    "game.contract.json": "4678b74ad44c071c392960330d53ab29c5b4b8e637307d184bd39a289e6b6eab",
+    "src/headless.mjs": "110ed54b0c5b6ac3ae84ba19349f87a2e1a4d96ea57db6d1a28f84760875e849",
+    "index.html": "8827d724a25a6dc22fd05b941a2455da3d80d94ac8b748f7966afce17eca563f",
+    "scripts/bench.mjs": "beffb01980343a37fa11163d7073f891fa8d042450bdd923375989b50ba05677",
+    "scripts/soak.mjs": "54d93f1df6209879031a303c181e5a8a1c63322ac4402f7ae2a2a2a415b219ab",
+    "scripts/serve.mjs": "fd3c7e501ed463bdcea01d2a301f948a4dff3500209c499cfad5b5f627ddde59",
+    "scripts/leaderboard-store.mjs": "ccaaa0d2de86256d4d95d4085719ab5625634d6bb72cec10345665ef089e05fb",
+    "scripts/browser-runtime.mjs": "b08066961d8475b396804b26370d4f42b20ebf1f29b16370ef24fecdb6798394",
+    "src/core/benchmark.mjs": "dd8227048da20196161779b721319111e32c0bb9ad7c6c892cd4766402eb7b3c",
+    "src/core/campaign.mjs": "532a2970e00107b23a261f3acffa629b3a0a50af82c98c535e66de66cd372d41",
+    "src/core/game.mjs": "3c7e0e6d3f21f88f59892aad66d2f2978155e5d2b31ef96cffec742535918673",
+    "src/core/leaderboard.mjs": "c30bf4b9a39734693c27880ce41f0f529170b0ddf8def041076b449d4696ebcf",
+    "src/core/maps.mjs": "945e5ac1e73fced507b50466c8b6b9fad039584832c79ee8bd395e2d2ba1d8d1",
+    "src/core/metrics.mjs": "490aa1cbf055cfa2a2c27286de46c0a0266851db2e12c1c9dc67fc750d1cbdf8",
+    "src/core/validate.mjs": "57479140ccef00bdd984e0506a85d4c1573e5df4fccfc5f5f34e5c6407ae10b2",
+    "web/audio.mjs": "08b891d9d143adbc05f2c8d61ae9c28eb54afcae2c81bed3cc7b63eda82b707c",
+    "web/bench.html": "1f81059122a1b6194010976cd0e39574ee6762ce6104b53dc7d0386827c1c859",
+    "web/bench.mjs": "586c038552c356a959fc6d4d05a0e7c12af6fa5286dbd3e0b927de470a58c80a",
+    "web/bindings.mjs": "86d33971eb87a92349aeb688771a8def72f48644671dbe225df854f6ad95d92a",
+    "web/main.mjs": "33f718d268a4a9bf42d1b649ca9c1200c759cd975f567e0dc11cc2ae9beaa33f",
+    "web/palette.mjs": "2697aa302edcedda2ddb59be281381062a3c45715067132757f18b8cd66fe822",
+    "web/style.css": "c4b1c163d638036487ee2c15bc9e11ae748f061321097239a8c9ab919b9168de",
+    "web/world.mjs": "90c10e24070fa16880765bb1fbb087660f676ec3bacb64b8d21d0178da8a3baa"
+  },
+  "steps": [
+    {
+      "command": [
+        "node",
+        "--test"
+      ],
+      "exit_code": 0,
+      "duration_ms": 4718,
+      "stdout": "TAP version 13\n# Subtest: v1.2 fuel constants, durations and victory thresholds\nok 1 - v1.2 fuel constants, durations and victory thresholds\n  ---\n  duration_ms: 5.8895\n  ...\n# Subtest: integer fuel burns exactly 6000 ticks, then out once and remembers ever_lit\nok 2 - integer fuel burns exactly 6000 ticks, then out once and remembers ever_lit\n  ---\n  duration_ms: 66.7593\n  ...\n# Subtest: all lamps lit never wins before dawn\nok 3 - all lamps lit never wins before dawn\n  ---\n  duration_ms: 2.247\n  ...\n# Subtest: first light costs 10 and increases capacity; new event has relight:false\nok 4 - first light costs 10 and increases capacity; new event has relight:false\n  ---\n  duration_ms: 0.8998\n  ...\n# Subtest: relight accepts partial deposits, costs 5, adds 40 and increments count\nok 5 - relight accepts partial deposits, costs 5, adds 40 and increments count\n  ---\n  duration_ms: 0.7192\n  ...\n# Subtest: capacity seeded by successful_lights clamps at 20; collecting uses dynamic limit\nok 6 - capacity seeded by successful_lights clamps at 20; collecting uses dynamic limit\n  ---\n  duration_ms: 2.2591\n  ...\n# Subtest: refuel uses ceil, caps fuel, preserves leftover, and scores only consumed motes\nok 7 - refuel uses ceil, caps fuel, preserves leftover, and scores only consumed motes\n  ---\n  duration_ms: 0.8405\n  ...\n# Subtest: exact full lamp not selected; next eligible lamp receives interaction\nok 8 - exact full lamp not selected; next eligible lamp receives interaction\n  ---\n  duration_ms: 0.8098\n  ...\n# Subtest: fuel burns before selection, so initially full lamp can receive 1 mote in step 1\nok 9 - fuel burns before selection, so initially full lamp can receive 1 mote in step 1\n  ---\n  duration_ms: 0.6487\n  ...\n# Subtest: nearest accepting lamp wins, with ID tie-break across lit and unlit\nok 10 - nearest accepting lamp wins, with ID tie-break across lit and unlit\n  ---\n  duration_ms: 25.7389\n  ...\n# Subtest: exactly 30 has safe zone; rounded 30 from below does not\nok 11 - exactly 30 has safe zone; rounded 30 from below does not\n  ---\n  duration_ms: 0.5168\n  ...\n# Subtest: drain adds 5 fuel/s to natural decay and logs after 60 continuous ticks\nok 12 - drain adds 5 fuel/s to natural decay and logs after 60 continuous ticks\n  ---\n  duration_ms: 2.6446\n  ...\n# Subtest: multiple draining shades stack and one lantern_out is emitted\nok 13 - multiple draining shades stack and one lantern_out is emitted\n  ---\n  duration_ms: 4.6451\n  ...\n# Subtest: wander prefers weak lamp, tie picks L1, chase keeps following Mây\nok 14 - wander prefers weak lamp, tie picks L1, chase keeps following Mây\n  ---\n  duration_ms: 0.8595\n  ...\n# Subtest: drain switches chase at 6m, and leaves drain when out of target radius\nok 15 - drain switches chase at 6m, and leaves drain when out of target radius\n  ---\n  duration_ms: 0.6049\n  ...\n# Subtest: refuel restores safety before contact and ejects draining shade\nok 16 - refuel restores safety before contact and ejects draining shade\n  ---\n  duration_ms: 0.6509\n  ...\n# Subtest: pulse draining target awards total 15; other targets award total 5\nok 17 - pulse draining target awards total 15; other targets award total 5\n  ---\n  duration_ms: 5.919\n  ...\n# Subtest: pause freezes natural decay, drain timers and capacity\nok 18 - pause freezes natural decay, drain timers and capacity\n  ---\n  duration_ms: 4.1819\n  ...\n# Subtest: fuel reaching zero before interaction can relight in same final tick\nok 19 - fuel reaching zero before interaction can relight in same final tick\n  ---\n  duration_ms: 0.932\n  ...\n# Subtest: dawn thresholds across all nights, no early win, correct end reason\nok 20 - dawn thresholds across all nights, no early win, correct end reason\n  ---\n  duration_ms: 1.421\n  ...\n# Subtest: lamp expiring at dawn is excluded and death at dawn always overrides threshold\nok 21 - lamp expiring at dawn is excluded and death at dawn always overrides threshold\n  ---\n  duration_ms: 1.3213\n  ...\n# Subtest: dawn fuel bonus floors exact fuel, not rounded snapshot\nok 22 - dawn fuel bonus floors exact fuel, not rounded snapshot\n  ---\n  duration_ms: 0.5564\n  ...\n# Subtest: snapshots expose fuel, ever_lit, relit_count, capacity and no integer internals\nok 23 - snapshots expose fuel, ever_lit, relit_count, capacity and no integer internals\n  ---\n  duration_ms: 0.4117\n  ...\n# Subtest: scenario capacity validation and no setup success/relight scores\nok 24 - scenario capacity validation and no setup success/relight scores\n  ---\n  duration_ms: 0.7021\n  ...\n# Subtest: v1.2 standard tuning and three exact map starts/lantern counts\nok 25 - v1.2 standard tuning and three exact map starts/lantern counts\n  ---\n  duration_ms: 5.8769\n  ...\n# Subtest: tick zero has no events; first step night_start; setup awards no points\nok 26 - tick zero has no events; first step night_start; setup awards no points\n  ---\n  duration_ms: 1.791\n  ...\n# Subtest: fixed 60Hz movement and persistent input\nok 27 - fixed 60Hz movement and persistent input\n  ---\n  duration_ms: 3.3382\n  ...\n# Subtest: normalized diagonal and yaw rotation\nok 28 - normalized diagonal and yaw rotation\n  ---\n  duration_ms: 1.9039\n  ...\n# Subtest: jump uses standard velocity/gravity, edge and full air control\nok 29 - jump uses standard velocity/gravity, edge and full air control\n  ---\n  duration_ms: 1.0858\n  ...\n# Subtest: pickup inclusive XZ and height gates, capacity, no pickup score\nok 30 - pickup inclusive XZ and height gates, capacity, no pickup score\n  ---\n  duration_ms: 0.6517\n  ...\n# Subtest: partial deposit preserves remainder and Phase 3 scores +5 per deposited mote\nok 31 - partial deposit preserves remainder and Phase 3 scores +5 per deposited mote\n  ---\n  duration_ms: 0.9317\n  ...\n# Subtest: interaction outside radius fails, equal distance picks smallest ID\nok 32 - interaction outside radius fails, equal distance picks smallest ID\n  ---\n  duration_ms: 15.7905\n  ...\n# Subtest: dash travels 2.8m over 12 ticks, standing uses +Z facing, cooldown from start\nok 33 - dash travels 2.8m over 12 ticks, standing uses +Z facing, cooldown from start\n  ---\n  duration_ms: 2.6951\n  ...\n# Subtest: dash direction follows movement and maintains height in air\nok 34 - dash direction follows movement and maintains height in air\n  ---\n  duration_ms: 1.656\n  ...\n# Subtest: dash is not invulnerable\nok 35 - dash is not invulnerable\n  ---\n  duration_ms: 1.1367\n  ...\n# Subtest: pulse uses 3D center, exact boundary and deferred push over 15 ticks\nok 36 - pulse uses 3D center, exact boundary and deferred push over 15 ticks\n  ---\n  duration_ms: 1.6102\n  ...\n# Subtest: pulse held edge, insufficient resource, cooldown and stun expiry\nok 37 - pulse held edge, insufficient resource, cooldown and stun expiry\n  ---\n  duration_ms: 2.0781\n  ...\n# Subtest: pulse push stops at static tower wall\nok 38 - pulse push stops at static tower wall\n  ---\n  duration_ms: 0.8088\n  ...\n# Subtest: shade detection, lose chase and scenario default wander\nok 39 - shade detection, lose chase and scenario default wander\n  ---\n  duration_ms: 0.549\n  ...\n# Subtest: Night 3 shade speed is 4.5\nok 40 - Night 3 shade speed is 4.5\n  ---\n  duration_ms: 0.4003\n  ...\n# Subtest: shade hit one per tick, drops half in annulus, recoils, respects invuln\nok 41 - shade hit one per tick, drops half in annulus, recoils, respects invuln\n  ---\n  duration_ms: 2.6334\n  ...\n# Subtest: contact checks height and invuln snapshot is boolean\nok 42 - contact checks height and invuln snapshot is boolean\n  ---\n  duration_ms: 0.485\n  ...\n# Subtest: safe zones only lit lamps, eject within 30 ticks and prevent hits\nok 43 - safe zones only lit lamps, eject within 30 ticks and prevent hits\n  ---\n  duration_ms: 0.9053\n  ...\n# Subtest: fall ignores invuln, loses all carried once, respawns after 60 ticks\nok 44 - fall ignores invuln, loses all carried once, respawns after 60 ticks\n  ---\n  duration_ms: 0.9782\n  ...\n# Subtest: fall with last flame loses immediately\nok 45 - fall with last flame loses immediately\n  ---\n  duration_ms: 0.4041\n  ...\n# Subtest: island edge is open; player actually falls\nok 46 - island edge is open; player actually falls\n  ---\n  duration_ms: 0.8145\n  ...\n# Subtest: pause increments tick only, freezes every gameplay timer; rising edges resume\nok 47 - pause increments tick only, freezes every gameplay timer; rising edges resume\n  ---\n  duration_ms: 0.6907\n  ...\n# Subtest: natural mote points: 20 distinct at setup, no more than available points; schedule 240\nok 48 - natural mote points: 20 distinct at setup, no more than available points; schedule 240\n  ---\n  duration_ms: 42.722\n  ...\n# Subtest: shade spawn 2 at 300, 60 tick harmless spawning then wander/chase\nok 49 - shade spawn 2 at 300, 60 tick harmless spawning then wander/chase\n  ---\n  duration_ms: 30.367\n  ...\n# Subtest: bamboo bridge and void geometry; ramps, terraces and tower surfaces\nok 50 - bamboo bridge and void geometry; ramps, terraces and tower surfaces\n  ---\n  duration_ms: 0.3478\n  ...\n# Subtest: launch pad retains horizontal launch despite opposing movement and lands on island B\nok 51 - launch pad retains horizontal launch despite opposing movement and lands on island B\n  ---\n  duration_ms: 1.8879\n  ...\n# Subtest: Night 3 launch pad lands on upper tier\nok 52 - Night 3 launch pad lands on upper tier\n  ---\n  duration_ms: 1.2244\n  ...\n# Subtest: dash during launch follows actual locked launch direction despite opposing keys\nok 53 - dash during launch follows actual locked launch direction despite opposing keys\n  ---\n  duration_ms: 0.363\n  ...\n# Subtest: cannot walk through upper terrace wall or tower\nok 54 - cannot walk through upper terrace wall or tower\n  ---\n  duration_ms: 1.5383\n  ...\n# Subtest: charm refresh, speed 7.2, zero dash cooldown, respawn 2700 ticks\nok 55 - charm refresh, speed 7.2, zero dash cooldown, respawn 2700 ticks\n  ---\n  duration_ms: 39.1939\n  ...\n# Subtest: drifter spawn on 1200 tick and maximum 2\nok 56 - drifter spawn on 1200 tick and maximum 2\n  ---\n  duration_ms: 54.4716\n  ...\n# Subtest: drifter steals before shade hit even while invulnerable/safe\nok 57 - drifter steals before shade hit even while invulnerable/safe\n  ---\n  duration_ms: 0.9361\n  ...\n# Subtest: drifter chase threshold and pulse on chase/flee return stolen motes\nok 58 - drifter chase threshold and pulse on chase/flee return stolen motes\n  ---\n  duration_ms: 1.5747\n  ...\n# Subtest: dropped TTL expires exactly, pause freezes TTL\nok 59 - dropped TTL expires exactly, pause freezes TTL\n  ---\n  duration_ms: 5.7997\n  ...\n# Subtest: wind warning 2 seconds, gust 5 seconds, deterministic direction and push\nok 60 - wind warning 2 seconds, gust 5 seconds, deterministic direction and push\n  ---\n  duration_ms: 22.8512\n  ...\n# Subtest: dawn tick includes last deposit and new fuel bonuses, no setup score\nok 61 - dawn tick includes last deposit and new fuel bonuses, no setup score\n  ---\n  duration_ms: 1.0329\n  ...\n# Subtest: no_flames always wins priority over dawn threshold\nok 62 - no_flames always wins priority over dawn threshold\n  ---\n  duration_ms: 0.4179\n  ...\n# Subtest: snapshots contain v1.1 fields and three-decimal coordinates\nok 63 - snapshots contain v1.1 fields and three-decimal coordinates\n  ---\n  duration_ms: 0.5801\n  ...\n# Subtest: same seed/scenario/inputs deterministic including all entity IDs\nok 64 - same seed/scenario/inputs deterministic including all entity IDs\n  ---\n  duration_ms: 200.6663\n  ...\n# Subtest: walk smoothly up standard ramp to Y=3\nok 65 - walk smoothly up standard ramp to Y=3\n  ---\n  duration_ms: 1.2679\n  ...\n# Subtest: recoil moves exactly two metres over 60 subsequent ticks\nok 66 - recoil moves exactly two metres over 60 subsequent ticks\n  ---\n  duration_ms: 1.4897\n  ...\n# Subtest: air dash reports zero vertical velocity and freezes Y\nok 67 - air dash reports zero vertical velocity and freezes Y\n  ---\n  duration_ms: 0.5735\n  ...\n# Subtest: campaign counts only won nights and replaces repeated completions\nok 68 - campaign counts only won nights and replaces repeated completions\n  ---\n  duration_ms: 0.485\n  ...\n# Subtest: invalid schemas rejected, v1.1 scenario extensions accepted\nok 69 - invalid schemas rejected, v1.1 scenario extensions accepted\n  ---\n  duration_ms: 1.3591\n  ...\n# Subtest: real CLI handles night 3, pause snapshots, event order, invalid data exit 2\nok 70 - real CLI handles night 3, pause snapshots, event order, invalid data exit 2\n  ---\n  duration_ms: 151.2131\n  ...\n# Subtest: contract v1.3 declares bench_cmd and soak_cmd and keeps v1.2 tuning\nok 71 - contract v1.3 declares bench_cmd and soak_cmd and keeps v1.2 tuning\n  ---\n  duration_ms: 3.1651\n  ...\n# Subtest: frame metrics follow the Ticket-04 formulas\nok 72 - frame metrics follow the Ticket-04 formulas\n  ---\n  duration_ms: 0.85\n  ...\n# Subtest: leaderboard names: 3–12 of [A-Za-z0-9_], Vietnamese diacritics accepted as a bonus\nok 73 - leaderboard names: 3–12 of [A-Za-z0-9_], Vietnamese diacritics accepted as a bonus\n  ---\n  duration_ms: 0.4566\n  ...\n# Subtest: leaderboard entries need ISO 8601 with a time zone and valid ranges\nok 74 - leaderboard entries need ISO 8601 with a time zone and valid ranges\n  ---\n  duration_ms: 1.4767\n  ...\n# Subtest: leaderboard ranks by score desc, ties by earlier achieved_at, keeps top 10\nok 75 - leaderboard ranks by score desc, ties by earlier achieved_at, keeps top 10\n  ---\n  duration_ms: 0.7835\n  ...\n# Subtest: leaderboard persists on disk and --export-leaderboard writes entries in rank order\nok 76 - leaderboard persists on disk and --export-leaderboard writes entries in rank order\n  ---\n  duration_ms: 347.6496\n  ...\n# Subtest: key bindings: defaults valid, duplicates/camera keys reported, invalid saved data falls back\nok 77 - key bindings: defaults valid, duplicates/camera keys reported, invalid saved data falls back\n  ---\n  duration_ms: 1.2361\n  ...\n# Subtest: benchmark scene: 200 wandering shades, 100 motes, L1–L3 lit at fuel 100; no spawn/damage/pickup/burn/end\nok 78 - benchmark scene: 200 wandering shades, 100 motes, L1–L3 lit at fuel 100; no spawn/damage/pickup/burn/end\n  ---\n  duration_ms: 1036.4003\n  ...\n# Subtest: soak command: one process, rotating nights, no crashes, bad args exit 2\nok 79 - soak command: one process, rotating nights, no crashes, bad args exit 2\n  ---\n  duration_ms: 1143.3345\n  ...\n# Subtest: bench command rejects bad arguments with exit code 2 before launching a browser\nok 80 - bench command rejects bad arguments with exit code 2 before launching a browser\n  ---\n  duration_ms: 1922.0085\n  ...\n# Subtest: campaign counts nights won for the leaderboard entry\nok 81 - campaign counts nights won for the leaderboard entry\n  ---\n  duration_ms: 0.373\n  ...\n1..81\n# tests 81\n# suites 0\n# pass 81\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 4650.1117\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/build.mjs"
+      ],
+      "exit_code": 0,
+      "duration_ms": 101,
+      "stdout": "Built dist/: self-contained static web game, no CDN required.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/phase-2/dash.json",
+        "--inputs",
+        "tests/scenarios/phase-2/dash.inputs.json",
+        "--ticks",
+        "180",
+        "--snapshot-every",
+        "10",
+        "--out",
+        "docs/proof/phase-4/dash.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 76,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/phase-2/pulse.json",
+        "--inputs",
+        "tests/scenarios/phase-2/pulse.inputs.json",
+        "--ticks",
+        "180",
+        "--snapshot-every",
+        "10",
+        "--out",
+        "docs/proof/phase-4/pulse.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 91,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/phase-2/fall.json",
+        "--ticks",
+        "120",
+        "--snapshot-every",
+        "10",
+        "--out",
+        "docs/proof/phase-4/fall.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 72,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "2",
+        "--scenario",
+        "tests/scenarios/phase-2/launch.json",
+        "--ticks",
+        "86",
+        "--snapshot-every",
+        "10",
+        "--out",
+        "docs/proof/phase-4/launch.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 74,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "2",
+        "--scenario",
+        "tests/scenarios/phase-2/charm.json",
+        "--ticks",
+        "2800",
+        "--snapshot-every",
+        "10",
+        "--out",
+        "docs/proof/phase-4/charm.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 149,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "2",
+        "--scenario",
+        "tests/scenarios/phase-2/drifter.json",
+        "--ticks",
+        "300",
+        "--snapshot-every",
+        "10",
+        "--out",
+        "docs/proof/phase-4/drifter.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 76,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "2",
+        "--scenario",
+        "tests/scenarios/phase-2/drifter-return.json",
+        "--inputs",
+        "tests/scenarios/phase-2/pulse.inputs.json",
+        "--ticks",
+        "150",
+        "--snapshot-every",
+        "10",
+        "--out",
+        "docs/proof/phase-4/drifter-return.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 72,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "3",
+        "--scenario",
+        "tests/scenarios/phase-2/wind.json",
+        "--ticks",
+        "2160",
+        "--snapshot-every",
+        "10",
+        "--out",
+        "docs/proof/phase-4/wind.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 112,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/phase-3/dawn-night-1.json",
+        "--ticks",
+        "60",
+        "--out",
+        "docs/proof/phase-4/won-night-1.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 73,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "2",
+        "--scenario",
+        "tests/scenarios/phase-3/dawn-night-2.json",
+        "--ticks",
+        "60",
+        "--out",
+        "docs/proof/phase-4/won-night-2.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 69,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "3",
+        "--scenario",
+        "tests/scenarios/phase-3/dawn-night-3.json",
+        "--ticks",
+        "60",
+        "--out",
+        "docs/proof/phase-4/won-night-3.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 66,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/phase-3/fuel-out.json",
+        "--ticks",
+        "2",
+        "--out",
+        "docs/proof/phase-4/fuel-out.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 68,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/phase-3/relight.json",
+        "--inputs",
+        "tests/scenarios/phase-3/interact.inputs.json",
+        "--ticks",
+        "60",
+        "--out",
+        "docs/proof/phase-4/relight.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 73,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/phase-3/refuel.json",
+        "--inputs",
+        "tests/scenarios/phase-3/interact.inputs.json",
+        "--ticks",
+        "60",
+        "--out",
+        "docs/proof/phase-4/refuel.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 73,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/phase-3/drain.json",
+        "--ticks",
+        "120",
+        "--out",
+        "docs/proof/phase-4/drain.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 90,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/phase-3/pulse-drain.json",
+        "--inputs",
+        "tests/scenarios/phase-3/../phase-2/pulse.inputs.json",
+        "--ticks",
+        "120",
+        "--out",
+        "docs/proof/phase-4/pulse-drain.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 74,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/phase-3/no-early-win.json",
+        "--ticks",
+        "60",
+        "--out",
+        "docs/proof/phase-4/no-early-win.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 74,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "77",
+        "--night",
+        "2",
+        "--ticks",
+        "3600",
+        "--snapshot-every",
+        "60",
+        "--out",
+        "docs/proof/phase-4/replay-a.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 365,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "77",
+        "--night",
+        "2",
+        "--ticks",
+        "3600",
+        "--snapshot-every",
+        "60",
+        "--out",
+        "docs/proof/phase-4/replay-b.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 382,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "3",
+        "--scenario",
+        "tests/scenarios/phase-2/benchmark.json",
+        "--ticks",
+        "18000",
+        "--snapshot-every",
+        "60",
+        "--out",
+        "docs/proof/phase-4/benchmark.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 1087,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--expose-gc",
+        "--max-semi-space-size=1",
+        "--no-opt",
+        "scripts/soak.mjs",
+        "--seed",
+        "7",
+        "--nights",
+        "10",
+        "--out",
+        "docs/proof/phase-4/soak.json"
+      ],
+      "exit_code": 0,
+      "duration_ms": 3114,
+      "stdout": "{\"nights\":10,\"crashes\":0,\"results\":[\"lost\",\"lost\",\"lost\",\"lost\",\"lost\",\"lost\",\"lost\",\"lost\",\"lost\",\"lost\"],\"mem_start_mb\":34.63671875,\"mem_end_mb\":37.4765625,\"duration_s\":3.0191782000000003}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import('./scripts/leaderboard-store.mjs').then(async s=>{await s.addEntry({name:'Mây_01',score:420,nights_won:1,seed:12},new Date('2026-11-20T10:00:00Z'));await s.addEntry({name:'Dawn',score:1800,nights_won:3,seed:12},new Date('2026-11-20T10:05:00Z'));await s.addEntry({name:'Tie_late',score:420,nights_won:1,seed:12},new Date('2026-11-20T10:09:00Z'));})"
+      ],
+      "exit_code": 0,
+      "duration_ms": 73,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/serve.mjs",
+        "--export-leaderboard",
+        "docs/proof/phase-4/leaderboard-export.json"
+      ],
+      "exit_code": 0,
+      "duration_ms": 70,
+      "stdout": "Exported 3 leaderboard entries to docs/proof/phase-4/leaderboard-export.json\n",
+      "stderr": ""
+    }
+  ]
+}
