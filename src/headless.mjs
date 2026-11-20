@@ -16,7 +16,7 @@ function parseArgs(args) {
     if (!/^-?\d+$/.test(options[key]) || !Number.isSafeInteger(Number(options[key]))) throw new Error(`Invalid --${key}`);
     options[key] = Number(options[key]);
   }
-  if (options.night !== 1 || options.ticks < 0 || (options['snapshot-every'] ?? 10) < 1) throw new Error('Unsupported night or invalid tick count');
+  if (![1,2,3].includes(options.night) || options.ticks < 0 || (options['snapshot-every'] ?? 10) < 1) throw new Error('Unsupported night or invalid tick count');
   return options;
 }
 function readData(path) {
@@ -30,13 +30,13 @@ try {
   const contract = JSON.parse(readFileSync(new URL('../game.contract.json', import.meta.url), 'utf8'));
   const scenario = args.scenario ? readData(args.scenario) : {};
   const inputs = args.inputs ? validateInputs(readData(args.inputs)) : { frames: [] };
-  const game = new Game(contract.tuning, { seed: args.seed, scenario });
+  const game = new Game(contract.tuning, { seed: args.seed, night: args.night, scenario });
   fd = openSync(args.out, 'w');
   const write = obj => writeSync(fd, JSON.stringify(obj) + '\n');
   write(game.snapshot());
   let frameIndex = 0;
   const every = args['snapshot-every'] ?? 10;
-  for (let k = 0; k < args.ticks && game.state === 'playing'; k++) {
+  for (let k = 0; k < args.ticks && !['won','lost'].includes(game.state); k++) {
     const frame = inputs.frames[frameIndex]?.tick === k ? inputs.frames[frameIndex++] : {};
     const { tick, ...patch } = frame;
     for (const event of game.step(patch)) write(event);

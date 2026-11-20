@@ -1,76 +1,39 @@
-import { chromium } from 'playwright-core';
-import { spawn } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import {chromium} from 'playwright-core';
+import {spawn} from 'node:child_process';
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 import assert from 'node:assert/strict';
-import { fileURLToPath } from 'node:url';
-
-process.chdir(fileURLToPath(new URL('../',import.meta.url)));
-mkdirSync('docs/proof/phase-1',{recursive:true});
-const server=spawn(process.execPath,['scripts/serve.mjs'],{env:{...process.env,PORT:'4175'},stdio:'pipe'});
-let browser;
-const errors=[], failedRequests=[], checks=[];
-try {
-  for(let i=0;i<50;i++) {
-    try { if((await fetch('http://127.0.0.1:4175')).ok) break; } catch {}
-    await new Promise(resolve=>setTimeout(resolve,100));
-  }
-  const options={headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']};
-  if(process.env.BROWSER_PATH) options.executablePath=process.env.BROWSER_PATH;
-  else options.channel='msedge';
-  browser=await chromium.launch(options);
-  const page=await browser.newPage({viewport:{width:1440,height:960},deviceScaleFactor:1});
-  page.on('pageerror',e=>errors.push(e.message));
-  page.on('requestfailed',r=>failedRequests.push({url:r.url(),failure:r.failure()}));
-  await page.goto('http://127.0.0.1:4175',{waitUntil:'networkidle'});
-  await page.waitForFunction(()=>window.lanternGame?.snapshot().tick===0);
-  await page.screenshot({path:'docs/proof/phase-1/title.png'});
-  checks.push('title overlay and WebGL renderer initialized, tick 0');
-  await page.getByRole('button',{name:'Bắt đầu hành trình'}).click();
-  await page.waitForFunction(()=>window.lanternGame.snapshot().tick>=5);
-  const before=await page.evaluate(()=>window.lanternGame.snapshot());
-  await page.keyboard.down('KeyS'); await page.waitForTimeout(700); await page.keyboard.up('KeyS');
-  const after=await page.evaluate(()=>window.lanternGame.snapshot());
-  assert.ok(after.player.pos[2]>before.player.pos[2]);
-  checks.push('keyboard movement changes shared simulation position');
-  await page.keyboard.down('Space');
-  await page.waitForFunction(()=>window.lanternGame.snapshot().player.pos[1]>0);
-  await page.keyboard.up('Space'); checks.push('Space triggers jump');
-  await page.keyboard.press('Escape');
-  const paused=await page.evaluate(()=>window.lanternGame.snapshot().tick);
-  await page.waitForTimeout(250); assert.equal(await page.evaluate(()=>window.lanternGame.snapshot().tick),paused);
-  checks.push('pause freezes gameplay ticks');
-  await page.getByRole('button',{name:'Tiếp tục hành trình'}).click();
-  await page.waitForFunction(t=>window.lanternGame.snapshot().tick>t,paused);
-  await page.keyboard.down('ArrowRight'); await page.waitForTimeout(300); await page.keyboard.up('ArrowRight');
-  await page.screenshot({path:'docs/proof/phase-1/gameplay.png'});
-  checks.push('resume works; HUD, minimap and orbit captured');
-  const render=await page.evaluate(()=>window.lanternGame.rendererInfo());
-  assert.ok(render.calls>0 && render.triangles>0);
-  await page.getByRole('button',{name:'Hướng dẫn'}).click();
-  await page.getByRole('button',{name:'Tiếp tục hành trình'}).waitFor(); checks.push('help panel works');
-  await page.setViewportSize({width:700,height:850});
-  await page.screenshot({path:'docs/proof/phase-1/compact.png'}); checks.push('compact layout captured at 700×850');
-  // UI-only fixture: shorten dawn via intercepted tuning; production files stay unchanged.
-  const terminalPage=await browser.newPage({viewport:{width:1200,height:800}});
-  terminalPage.on('pageerror',e=>errors.push(e.message));
-  await terminalPage.route('**/game.contract.json',async route=>{
-    const response=await route.fetch(); const data=await response.json();
-    data.tuning.night1_duration_s=.1;
-    await route.fulfill({response,json:data});
-  });
-  await terminalPage.goto('http://127.0.0.1:4175',{waitUntil:'networkidle'});
-  await terminalPage.getByRole('button',{name:'Bắt đầu hành trình'}).click();
-  await terminalPage.getByRole('button',{name:'Chơi lại Đêm 1'}).waitFor();
-  assert.equal(await terminalPage.evaluate(()=>window.lanternGame.snapshot().state),'lost');
-  await terminalPage.getByRole('button',{name:'Chơi lại Đêm 1'}).click();
-  await terminalPage.getByRole('button',{name:'Chơi lại Đêm 1'}).waitFor();
-  assert.equal(await terminalPage.evaluate(()=>window.lanternGame.snapshot().tick),6);
-  checks.push('dawn end overlay and restart tested with explicitly shortened 0.1s UI fixture; production tuning unchanged');
-  await terminalPage.close();
-  assert.deepEqual(errors,[]); assert.deepEqual(failedRequests,[]);
-  writeFileSync('docs/proof/phase-1/browser-qa.json',JSON.stringify({passed:true,generated_at:new Date().toISOString(),browser:browser.version(),renderer:'software SwiftShader; not a hardware FPS benchmark',checks,render,page_errors:errors,failed_requests:failedRequests},null,2)+'\n');
-  console.log(JSON.stringify({passed:true,checks,render}));
-} catch(error) {
-  writeFileSync('docs/proof/phase-1/browser-qa.json',JSON.stringify({passed:false,error:error.message,page_errors:errors,failed_requests:failedRequests,checks},null,2)+'\n');
-  throw error;
-} finally { await browser?.close(); server.kill(); }
+import os from 'node:os';
+process.chdir(fileURLToPath(new URL('../',import.meta.url)));const dir='docs/proof/phase-2';mkdirSync(dir,{recursive:true});
+const server=spawn(process.execPath,['scripts/serve.mjs'],{env:{...process.env,PORT:'4175'},stdio:'pipe'});let browser;const errors=[],checks=[],fps=[];
+const options={headless:true};if(process.env.SOFTWARE_WEBGL==='1')options.args=['--use-angle=swiftshader','--enable-unsafe-swiftshader'];if(process.env.BROWSER_PATH)options.executablePath=process.env.BROWSER_PATH;else options.channel='msedge';
+try{
+ for(let i=0;i<50;i++){try{if((await fetch('http://127.0.0.1:4175')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
+ browser=await chromium.launch(options);const context=await browser.newContext({viewport:{width:1280,height:720},deviceScaleFactor:1});
+ for(let night=1;night<=3;night++){
+  const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
+  if(night>1)await page.route('**/campaign.mjs',async route=>{const response=await route.fetch();const body=(await response.text()).replace('this.night=1;',`this.night=${night};`);await route.fulfill({response,body});});
+  await page.goto('http://127.0.0.1:4175',{waitUntil:'networkidle'});await page.waitForFunction(()=>window.lanternGame);if(night===1)await page.screenshot({path:`${dir}/menu.png`});
+  await page.getByRole('button',{name:'Bắt đầu hành trình'}).click();await page.getByRole('button',{name:`Vào Đêm ${night}`}).click();await page.waitForFunction(()=>window.lanternGame.snapshot().sim_tick>=3);
+  const initial=await page.evaluate(()=>window.lanternGame.snapshot());assert.equal(initial.night,night);
+  await page.keyboard.down('KeyD');await page.waitForTimeout(400);await page.keyboard.up('KeyD');const moved=await page.evaluate(()=>window.lanternGame.snapshot());assert.ok(moved.player.pos[0]>initial.player.pos[0]);
+  await page.keyboard.press('ShiftLeft');await page.waitForTimeout(100);await page.keyboard.down('Space');await page.waitForTimeout(80);await page.keyboard.up('Space');
+  await page.waitForFunction(()=>window.lanternGame.snapshot().sim_tick>=420);
+  const measured=await page.evaluate(()=>new Promise(resolve=>{const begin=performance.now();let frames=0;function count(now){frames++;if(now-begin>=2500)resolve({fps:frames*1000/(now-begin),frames,elapsed_ms:now-begin});else requestAnimationFrame(count);}requestAnimationFrame(count);}));fps.push({night,...measured,shades:await page.evaluate(()=>window.lanternGame.snapshot().shades.length),draw_calls:await page.evaluate(()=>window.lanternGame.rendererInfo().calls)});
+  await page.screenshot({path:`${dir}/night-${night}.png`});
+  await page.keyboard.press('KeyP');await page.waitForFunction(()=>window.lanternGame.paused);const paused=await page.evaluate(()=>window.lanternGame.snapshot());await page.waitForTimeout(200);const later=await page.evaluate(()=>window.lanternGame.snapshot());assert.equal(later.sim_tick,paused.sim_tick);assert.ok(later.tick>paused.tick);
+  if(night===1){await page.getByRole('button',{name:'Cài đặt',exact:true}).click();await page.getByLabel('Âm lượng', {exact:true}).fill('35');await page.getByLabel('Độ nhạy chuột',{exact:true}).fill('140');await page.getByRole('button',{name:'Quay lại'}).click();await page.getByRole('button',{name:'Tiếp tục',exact:true}).click();await page.keyboard.press('Escape');await page.getByRole('button',{name:'Chơi lại Đêm',exact:true}).click();await page.waitForFunction(()=>window.lanternGame.screen==='playing');checks.push('pause tick/sim_tick, settings and retry UI');}
+  checks.push(`Night ${night} map and movement; screenshot captured. ${night>1?'Start-night-only fixture, production gameplay unchanged.':'Normal starting world.'}`);await page.close();
+ }
+ const settingsPage=await context.newPage();await settingsPage.goto('http://127.0.0.1:4175');await settingsPage.waitForFunction(()=>window.lanternGame);assert.equal(await settingsPage.evaluate(()=>window.lanternGame.settings().volume),.35);assert.equal(await settingsPage.evaluate(()=>window.lanternGame.settings().sensitivity),1.4);await settingsPage.close();checks.push('settings persist across page opens');
+ const chain=await context.newPage();chain.on('pageerror',e=>errors.push(e.message));await chain.addInitScript(()=>{globalThis.__qaScenario=night=>({random_motes:false,random_shades:false,random_drifters:false,wind_enabled:false,lanterns:Array.from({length:night+4},(_,i)=>({id:`L${i+1}`,lit:true}))});});
+ await chain.route('**/src/core/game.mjs',async route=>{const response=await route.fetch();const body=(await response.text()).replace('validateScenario(scenario,tuning,night);','scenario=globalThis.__qaScenario?.(night)??scenario;validateScenario(scenario,tuning,night);');await route.fulfill({response,body});});
+ await chain.goto('http://127.0.0.1:4175',{waitUntil:'networkidle'});await chain.getByRole('button',{name:'Bắt đầu hành trình'}).click();for(let n=1;n<=3;n++){await chain.getByRole('button',{name:`Vào Đêm ${n}`}).click();if(n<3)await chain.getByRole('button',{name:'Đêm tiếp theo'}).click();else await chain.getByRole('button',{name:'Hành trình mới'}).waitFor();}
+ assert.equal(await chain.evaluate(()=>window.lanternGame.screen),'dawn');const scores=await chain.evaluate(()=>window.lanternGame.campaign());assert.equal(scores.total,scores.scores.reduce((a,b)=>a+b,0));assert.ok(scores.scores.every(s=>s>0));await chain.screenshot({path:`${dir}/dawn-fixture.png`});await chain.close();checks.push('all-lit scenario fixture verifies three-night progression, totals and Dawn screen; not a manual gameplay victory');
+ const loss=await context.newPage();loss.on('pageerror',e=>errors.push(e.message));await loss.addInitScript(()=>{globalThis.__qaScenario=()=>({random_motes:false,random_shades:false,random_drifters:false,time_left_s:.1});});
+ await loss.route('**/src/core/game.mjs',async route=>{const response=await route.fetch();const body=(await response.text()).replace('validateScenario(scenario,tuning,night);','scenario=globalThis.__qaScenario?.(night)??scenario;validateScenario(scenario,tuning,night);');await route.fulfill({response,body});});
+ await loss.goto('http://127.0.0.1:4175',{waitUntil:'networkidle'});await loss.getByRole('button',{name:'Bắt đầu hành trình'}).click();await loss.getByRole('button',{name:'Vào Đêm 1'}).click();await loss.getByRole('button',{name:'Chơi lại Đêm',exact:true}).click();await loss.getByRole('button',{name:'Chơi lại Đêm',exact:true}).waitFor();assert.equal(await loss.evaluate(()=>window.lanternGame.snapshot().state),'lost');assert.equal(await loss.evaluate(()=>window.lanternGame.campaign().total),0);await loss.close();checks.push('0.1s dawn scenario fixture: losing and retrying same night never adds campaign score');
+ assert.deepEqual(errors,[]);const page=await context.newPage();await page.goto('http://127.0.0.1:4175');await page.waitForFunction(()=>window.lanternGame);const gpu=await page.evaluate(()=>{const c=document.querySelector('#game canvas'),gl=c.getContext('webgl2'),ext=gl.getExtension('WEBGL_debug_renderer_info');return ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):'unavailable';});await page.close();
+ if(process.env.SOFTWARE_WEBGL!=='1')assert.ok(fps.every(f=>f.fps>=30),'Average FPS below required 30');
+ const report={passed:true,generated_at:new Date().toISOString(),browser:browser.version(),cpu:os.cpus()[0]?.model,viewport:'1280x720',gpu,checks,page_errors:errors,fps,meets_30fps:fps.every(f=>f.fps>=30),notes:'FPS is RAF sample on this environment; inspect GPU renderer. Fixtures explicitly identified above.'};writeFileSync(`${dir}/browser-qa.json`,JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
+}catch(error){writeFileSync(`${dir}/browser-qa.json`,JSON.stringify({passed:false,error:error.message,checks,page_errors:errors,fps},null,2));throw error;}finally{await browser?.close();server.kill();}

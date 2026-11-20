@@ -1,9 +1,9 @@
 {
   "name": "dao-den-long",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Đảo Đèn Lồng — Phase 1, shared deterministic simulation and 3D web game",
+  "description": "Đảo Đèn Lồng — three nights, Test Contract v1.1",
   "scripts": {
     "start": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",

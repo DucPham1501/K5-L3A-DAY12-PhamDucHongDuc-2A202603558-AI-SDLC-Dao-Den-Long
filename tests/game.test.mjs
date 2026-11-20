@@ -1,193 +1,69 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import {readFileSync,mkdtempSync,writeFileSync,rmSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { Game, distance } from '../src/core/game.mjs';
-import { validateInputs, validateScenario, DataError } from '../src/core/validate.mjs';
-
-const { tuning: t } = JSON.parse(readFileSync(new URL('../game.contract.json', import.meta.url)));
-const fixture = (scenario = {}) => new Game(t, { seed: 42, scenario: { random_motes: false, random_shades: false, ...scenario } });
-const close = (actual, expected, epsilon = 1e-7) => assert.ok(Math.abs(actual-expected) < epsilon, `${actual} ≠ ${expected}`);
-const names = events => events.map(e=>e.name);
-const litOthers = ['L2','L3','L4','L5'].map(id=>({id,lit:true}));
-const run = (game, ticks, input = {}) => { for(let i=0;i<ticks && game.state==='playing';i++) game.step(input); return game; };
-
-test('tick 0: setup has no events/score; lantern patches preserve five lanterns', () => {
-  const g = fixture({ player: { pos:[0,0,0], carried:4 }, motes:[[0,0,0]], lanterns:[{id:'L1',lit:true}] });
-  assert.equal(g.tick,0); assert.equal(g.score,0); assert.deepEqual(g.events,[]);
-  assert.equal(g.player.carried,4); assert.equal(g.lanterns.length,5); assert.equal(g.snapshot().motes_active,1);
-  assert.equal(g.lanterns[0].deposited,t.lantern_cost);
+import {Game,distance} from '../src/core/game.mjs';
+import {Campaign} from '../src/core/campaign.mjs';
+import {getMap,groundHeight} from '../src/core/maps.mjs';
+import {validateInputs,validateScenario,DataError} from '../src/core/validate.mjs';
+const {tuning:t}=JSON.parse(readFileSync(new URL('../game.contract.json',import.meta.url)));
+const g=(s={},night=1)=>new Game(t,{night,seed:42,scenario:{random_motes:false,random_shades:false,random_drifters:false,wind_enabled:false,...s}});
+const run=(game,n,input={})=>{for(let i=0;i<n&&!['won','lost'].includes(game.state);i++)game.step(input);return game;};
+const close=(a,b,e=1e-6)=>assert.ok(Math.abs(a-b)<e,`${a} != ${b}`);
+const events=game=>game.events.filter(e=>e.name!=='night_start');
+test('v1.1 standard tuning and three exact map starts/lantern counts',()=>{
+ assert.equal(t.carry_capacity,10);assert.equal(t.safe_radius,6);assert.equal(t.pulse_cooldown_s,3);assert.equal(t.dash_speed,14);
+ for(let n=1;n<=3;n++){const game=g({},n),s=game.snapshot();assert.equal(s.night,n);assert.equal(s.lanterns.length,n+4);assert.deepEqual(s.player.pos,n===3?[0,0,-15]:[0,0,0]);assert.equal(game.motes.length,0);assert.equal(game.shades.length,0);}
+ assert.deepEqual(getMap(1).lanterns[1],[23.8,0,7.7]);
 });
-test('fixed speed, persistent input and exact time model', () => {
-  const g=fixture(); g.step({move:[0,1]}); run(g,119);
-  close(g.player.pos[2],12); close(g.timeLeft,298); assert.equal(g.tick,120);
-});
-test('diagonal movement is normalized', () => {
-  const g=fixture(); run(g,60,{move:[1,1]}); close(distance(g.player.pos,[0,0,0]),6);
-});
-test('camera-relative formula rotates +Z to +X at 90 degrees', () => {
-  const g=fixture(); run(g,60,{move:[0,1],cam_yaw_deg:90}); close(g.player.pos[0],6); close(g.player.pos[2],0);
-});
-test('jump uses a rising edge, lands without auto-jumping while held', () => {
-  const g=fixture(); g.step({jump:true}); assert.ok(g.player.pos[1]>0);
-  run(g,120,{jump:true}); close(g.player.pos[1],0);
-  g.step({jump:false}); g.step({jump:true}); assert.ok(g.player.pos[1]>0);
-});
-test('pickup uses XZ distance even during jump; inclusive boundary', () => {
-  const g=fixture({player:{pos:[0,8,0]},motes:[[t.pickup_radius,0,0],[t.pickup_radius+.001,0,0]]});
-  const e=g.step(); assert.equal(g.player.carried,1); assert.equal(g.motes.length,1);
-  assert.equal(g.score,t.score.per_mote); assert.equal(e[0].tick,1);
-});
-test('pickup stops at capacity and does not consume excess motes', () => {
-  const g=fixture({player:{carried:t.carry_capacity-1},motes:[[0,0,0],[0,0,0]]});
-  g.step(); assert.equal(g.player.carried,t.carry_capacity); assert.equal(g.motes.length,1);
-});
-test('deposit at exact interaction boundary, partial then full, preserve overflow', () => {
-  const g=fixture({player:{carried:4},lanterns:[{id:'L1',pos:[t.interact_radius,0,0]}]});
-  assert.deepEqual(names(g.step({interact:true})),['deposit']); assert.equal(g.lanterns[0].deposited,4);
-  g.player.carried=10; g.step({interact:true}); assert.equal(g.lanterns[0].deposited,4);
-  g.step({interact:false}); const events=g.step({interact:true});
-  assert.deepEqual(names(events),['deposit','lantern_lit']); assert.equal(g.player.carried,4);
-  assert.equal(g.score,t.score.per_lantern);
-  g.step({interact:false}); assert.deepEqual(g.step({interact:true}),[]); assert.equal(g.score,t.score.per_lantern);
-});
-test('deposit outside radius does nothing', () => {
-  const g=fixture({player:{carried:10},lanterns:[{id:'L1',pos:[t.interact_radius+.001,0,0]}]});
-  assert.deepEqual(g.step({interact:true}),[]); assert.equal(g.player.carried,10);
-});
-test('nearest unlit lantern is chosen when interaction ranges overlap', () => {
-  const g=fixture({player:{carried:10},lanterns:[{id:'L1',pos:[1.5,0,0]},{id:'L2',pos:[1,0,0]}]});
-  const events=g.step({interact:true}); assert.equal(events[0].data.lantern_id,'L2');
-});
-test('pulse includes exact radius, pushes, stuns and scores by affected shades', () => {
-  const g=fixture({player:{carried:10},shades:[{id:'inside',pos:[t.pulse_radius,1,0]},{id:'outside',pos:[t.pulse_radius+.001,1,0]}]});
-  const events=g.step({pulse:true}); const e=events.find(e=>e.name==='pulse');
-  assert.deepEqual(e.data.stunned_ids,['inside']); assert.equal(g.player.carried,7);
-  assert.equal(g.shades[0].state,'stunned'); close(g.shades[0].pos[0],8);
-  assert.equal(g.score,t.score.per_stun);
-});
-test('pulse without resources does not fire; holding the button never retries', () => {
-  const g=fixture({player:{carried:2}}); assert.deepEqual(g.step({pulse:true}),[]);
-  g.player.carried=10; assert.deepEqual(g.step({pulse:true}),[]);
-  g.step({pulse:false}); assert.equal(g.step({pulse:true})[0].name,'pulse');
-});
-test('pulse cooldown prevents rapid reactivation but allows action after expiry', () => {
-  const g=fixture({player:{carried:20}}); g.step({pulse:true}); g.step({pulse:false});
-  assert.deepEqual(g.step({pulse:true}),[]); assert.equal(g.player.carried,17);
-  run(g,57,{pulse:false}); assert.equal(g.step({pulse:true})[0].name,'pulse');
-});
-test('stun prevents motion and contact damage; chase resumes at expiry', () => {
-  const g=fixture({player:{carried:10},shades:[{pos:[0,0,0]}]}); g.step({pulse:true});
-  const pos=[...g.shades[0].pos]; run(g,119,{pulse:false}); assert.deepEqual(g.shades[0].pos,pos);
-  g.step(); assert.equal(g.shades[0].state,'chase'); assert.ok(g.shades[0].pos[0]<pos[0]); assert.equal(g.player.flames,3);
-});
-test('shade chases at declared speed', () => {
-  const g=fixture({shades:[{pos:[10,0,0]}]}); run(g,60); close(g.shades[0].pos[0],10-t.shade_speed);
-});
-test('contact loses one flame; overlapping shades respect shared invulnerability', () => {
-  const g=fixture({shades:[{pos:[0,0,0]},{pos:[0,0,0]}]});
-  const e=g.step(); assert.equal(e.filter(e=>e.name==='player_hit').length,1); assert.equal(g.player.flames,2);
-  run(g,89); assert.equal(g.player.flames,2); g.step(); assert.equal(g.player.flames,1);
-});
-test('lit lantern safe zone excludes shades and prevents damage at boundary', () => {
-  const g=fixture({player:{pos:[t.safe_radius,0,0]},lanterns:[{id:'L1',pos:[0,0,0],lit:true}],shades:[{pos:[t.safe_radius,0,0]}]});
-  run(g,120); assert.equal(g.player.flames,3); assert.ok(distance(g.shades[0].pos,[0,0,0])>t.safe_radius);
-});
-test('hit drop ratio is zero and inventory is retained', () => {
-  const g=fixture({player:{carried:17},shades:[{pos:[0,0,0]}]}); const e=g.step().find(e=>e.name==='player_hit');
-  assert.equal(e.data.dropped,0); assert.equal(g.player.carried,17);
-});
-test('zero flames ends with no_flames once and simulation freezes', () => {
-  const g=fixture({player:{flames:1},shades:[{pos:[0,0,0]}]}); const events=g.step();
-  assert.equal(g.state,'lost'); assert.deepEqual(events.at(-1).data,{result:'lost',reason:'no_flames'});
-  assert.deepEqual(g.step(),[]); assert.equal(g.tick,1);
-});
-test('dawn ends at exact number of steps', () => {
-  const g=fixture({time_left_s:1}); run(g,60); assert.equal(g.tick,60); assert.equal(g.timeLeft,0);
-  assert.equal(g.state,'lost'); assert.equal(g.events.at(-1).data.reason,'dawn');
-});
-test('last lantern wins, with declared bonuses; scenario-lit lamps award nothing', () => {
-  const g=fixture({player:{carried:10},lanterns:[{id:'L1',pos:[0,0,0]},...litOthers]});
-  const events=g.step({interact:true}); assert.equal(g.state,'won');
-  assert.deepEqual(names(events),['deposit','lantern_lit','game_over']);
-  assert.equal(g.score,t.score.per_lantern+299*t.score.per_second_left+3*t.score.per_flame_left);
-});
-test('all-lit scenario stays playing at snapshot 0, then resolves without lighting points', () => {
-  const g=fixture({lanterns:['L1',...litOthers.map(l=>l.id)].map(id=>({id,lit:true}))});
-  assert.equal(g.state,'playing'); assert.equal(g.score,0); g.step(); assert.equal(g.state,'won');
-  assert.equal(g.events.filter(e=>e.name==='lantern_lit').length,0);
-});
-test('scenario arrays replace lists; random flags prevent all later spawning', () => {
-  const g=fixture({motes:[],shades:[]}); run(g,1800); assert.deepEqual(g.motes,[]); assert.deepEqual(g.shades,[]);
-});
-test('default random world spawns deterministic shades with events after tick 0', () => {
-  const g=new Game(t,{seed:13,scenario:{player:{pos:[0,0,0]},lanterns:[{id:'L1',pos:[0,0,0],lit:true}]}});
-  const count=g.shades.length; run(g,900); assert.equal(g.shades.length,count+1);
-  assert.equal(g.events.find(e=>e.name==='shade_spawned').tick,900);
-});
-test('same seed, scenario, inputs gives byte-identical snapshots and IDs', () => {
-  const simulate = () => {
-    const g=new Game(t,{seed:517}); const output=[g.snapshot()];
-    for(let i=0;i<200;i++) { output.push(...g.step({move:[0,1],pulse:i%70===0})); if(i%10===0) output.push(g.snapshot()); }
-    return JSON.stringify(output);
-  };
-  assert.equal(simulate(),simulate());
-});
-test('explicit shade IDs cannot collide with automatic IDs', () => {
-  const g=fixture({shades:[{pos:[1,0,0]},{id:'S1',pos:[2,0,0]},{pos:[3,0,0]}]});
-  assert.equal(new Set(g.shades.map(s=>s.id)).size,3);
-});
-test('island boundary blocks outward motion without fall penalties', () => {
-  const g=fixture({player:{pos:[30,0,0]}}); run(g,60,{move:[1,0]}); close(g.player.pos[0],30); assert.equal(g.player.flames,3);
-});
-test('snapshots round all coordinates to three decimals', () => {
-  const g=fixture({player:{pos:[.123456,0,-.000001]}}); assert.deepEqual(g.snapshot().player.pos,[.123,0,0]);
-});
-
-test('invalid frame/scenario formats rejected with DataError', () => {
-  const invalidInputs=[{}, {frames:[{tick:1},{tick:1}]}, {frames:[{tick:2},{tick:1}]}, {frames:[{tick:-1}]}, {frames:[{tick:0,move:[2,0]}]}, {frames:[{tick:0,pulse:1}]}, {frames:[{tick:0,move:[0]}]}, {frames:[{tick:0,cam_yaw_deg:Infinity}]}];
-  for(const input of invalidInputs) assert.throws(()=>validateInputs(input),DataError);
-  for(const s of [{random_motes:1},{player:{carried:21}},{player:{pos:[0,0]}},{lanterns:[{id:'L6'}]},{shades:[{id:'x',pos:[0,0,0]},{id:'x',pos:[0,0,0]}]},{time_left_s:-1}])
-    assert.throws(()=>validateScenario(s,t),DataError);
-});
-
-const root = new URL('../', import.meta.url);
-test('real CLI: no GPU, fixed ticks, events, snapshots and final end record', () => {
-  const dir=mkdtempSync(path.join(os.tmpdir(),'lantern-cli-'));
-  try {
-    const scenario=path.join(dir,'scenario.json'), inputs=path.join(dir,'inputs.json'), output=path.join(dir,'out.jsonl');
-    writeFileSync(scenario,JSON.stringify({random_motes:false,random_shades:false,motes:[[0,0,0]]}));
-    writeFileSync(inputs,JSON.stringify({frames:[{tick:0,move:[0,1]},{tick:2,move:[0,0]}]}));
-    const result=spawnSync(process.execPath,['src/headless.mjs','--seed','42','--night','1','--scenario',scenario,'--inputs',inputs,'--ticks','7','--snapshot-every','3','--out',output],{cwd:root,encoding:'utf8'});
-    assert.equal(result.status,0,result.stderr);
-    const lines=readFileSync(output,'utf8').trim().split('\n').map(JSON.parse);
-    assert.deepEqual(lines.filter(l=>l.type==='snapshot').map(l=>l.tick),[0,3,6,7]);
-    assert.equal(lines[0].player.carried,0); assert.equal(lines[1].name,'mote_picked'); assert.equal(lines[1].tick,1);
-    assert.equal(lines.at(-1).type,'end'); assert.equal(lines.at(-1).ticks,7);
-    close(lines.at(-2).player.pos[2],.2);
-  } finally { rmSync(dir,{recursive:true,force:true}); }
-});
-test('real CLI: invalid JSON and invalid schema return exit 2, errors to stderr', () => {
-  const dir=mkdtempSync(path.join(os.tmpdir(),'lantern-invalid-'));
-  try {
-    const input=path.join(dir,'inputs.json');
-    for(const text of ['{bad','{"frames":[{"tick":0,"pulse":1}]}']) {
-      writeFileSync(input,text);
-      const result=spawnSync(process.execPath,['src/headless.mjs','--seed','1','--night','1','--inputs',input,'--ticks','1','--out',path.join(dir,'out.jsonl')],{cwd:root,encoding:'utf8'});
-      assert.equal(result.status,2); assert.ok(result.stderr.length>0); assert.equal(result.stdout,'');
-    }
-  } finally { rmSync(dir,{recursive:true,force:true}); }
-});
-test('real CLI: zero ticks produces snapshot 0 then end; unsupported night fails', () => {
-  const dir=mkdtempSync(path.join(os.tmpdir(),'lantern-zero-'));
-  try {
-    const output=path.join(dir,'out.jsonl');
-    const args=['src/headless.mjs','--seed','-1','--night','1','--ticks','0','--out',output];
-    assert.equal(spawnSync(process.execPath,args,{cwd:root}).status,0);
-    const lines=readFileSync(output,'utf8').trim().split('\n').map(JSON.parse);
-    assert.equal(lines.length,2); assert.equal(lines[1].ticks,0);
-    args[4]='2'; assert.equal(spawnSync(process.execPath,args,{cwd:root}).status,1);
-  } finally { rmSync(dir,{recursive:true,force:true}); }
+test('tick zero has no events; first step night_start; setup awards no points',()=>{const game=g({motes:[[0,0,0]],lanterns:[{id:'L1',lit:true}]});assert.deepEqual(game.events,[]);assert.equal(game.score,0);assert.equal(game.player.carried,0);game.step();assert.deepEqual(game.events[0],{type:'event',tick:1,name:'night_start',data:{night:1}});});
+test('fixed 60Hz movement and persistent input',()=>{const game=g();game.step({move:[0,1]});run(game,119);close(game.player.pos[2],12);close(game.timeLeft,298);});
+test('normalized diagonal and yaw rotation',()=>{const a=g();run(a,60,{move:[1,1]});close(distance(a.player.pos,[0,0,0]),6);const b=g();run(b,60,{move:[0,1],cam_yaw_deg:90});close(b.player.pos[0],6);close(b.player.pos[2],0);});
+test('jump uses standard velocity/gravity, edge and full air control',()=>{const game=g();game.step({jump:true,move:[1,0]});close(game.player.pos[1],7/60-10/3600);run(game,59,{jump:true});close(game.player.pos[0],6);close(game.player.pos[1],0);game.step({jump:true});close(game.player.pos[1],0);game.step({jump:false});game.step({jump:true});assert.ok(game.player.pos[1]>0);});
+test('pickup inclusive XZ and height gates, capacity, no pickup score',()=>{const game=g({player:{pos:[0,1.5,0],carried:9},motes:[[1,0,0],[0,0,0]]});game.step();assert.equal(game.player.carried,10);assert.equal(game.motes.length,1);assert.equal(game.score,0);const high=g({player:{pos:[0,2,0]},motes:[[0,0,0]]});high.step();assert.equal(high.player.carried,0);});
+test('partial deposit preserves remainder and score is per deposited mote',()=>{const game=g({player:{carried:4},lanterns:[{id:'L1',pos:[2,0,0]}]});game.step({interact:true});assert.equal(game.score,40);assert.equal(game.lanterns[0].deposited,4);game.player.carried=10;game.step({interact:true});assert.equal(game.lanterns[0].deposited,4);game.step({interact:false});game.step({interact:true});assert.equal(game.player.carried,4);assert.equal(game.score,200);assert.deepEqual(events(game).map(e=>e.name),['deposit','lantern_lit']);});
+test('interaction outside radius fails, equal distance picks smallest ID',()=>{const game=g({player:{carried:10},lanterns:[{id:'L1',pos:[2.001,0,0]}]});game.step({interact:true});assert.equal(game.player.carried,10);const b=g({player:{carried:10},lanterns:[{id:'L1',pos:[2,0,0]},{id:'L2',pos:[-2,0,0]}]});b.step({interact:true});assert.equal(events(b)[0].data.lantern_id,'L1');});
+test('dash travels 2.8m over 12 ticks, standing uses +Z facing, cooldown from start',()=>{const game=g();game.step({dash:true});run(game,11,{dash:true});close(game.player.pos[2],2.8);assert.equal(game.dashCD,79);game.step({dash:false});game.step({dash:true});close(game.player.pos[2],2.8);run(game,76,{dash:false});assert.equal(game.dashCD,1);game.step({dash:true});assert.equal(events(game)[0].name,'dash');});
+test('dash direction follows movement and maintains height in air',()=>{const game=g({player:{pos:[0,3,0]}});game.step({dash:true,move:[1,0]});const y=game.player.pos[1];run(game,11,{dash:true,move:[0,1]});close(game.player.pos[0],2.8);close(game.player.pos[1],y);});
+test('dash is not invulnerable',()=>{const game=g({shades:[{pos:[0,.8,.3]}]});game.step({dash:true});assert.equal(game.player.flames,2);});
+test('pulse uses 3D center, exact boundary and deferred push over 15 ticks',()=>{const game=g({player:{carried:10},shades:[{id:'S1',pos:[5,.8,0]},{id:'S2',pos:[0,6,0]}]});game.step({pulse:true});assert.deepEqual(game.events.find(e=>e.name==='pulse').data.stunned_ids,['S1']);close(game.shades[0].pos[0],5+4/15);run(game,14);close(game.shades[0].pos[0],9);assert.equal(game.shades[0].state,'stunned');assert.equal(game.score,5);assert.equal(game.player.carried,7);});
+test('pulse held edge, insufficient resource, cooldown and stun expiry',()=>{const a=g({player:{carried:2}});a.step({pulse:true});assert.ok(!a.events.some(e=>e.name==='pulse'));a.player.carried=10;a.step({pulse:true});assert.ok(!a.events.some(e=>e.name==='pulse'));a.step({pulse:false});a.step({pulse:true});assert.equal(a.pulseCD,180);a.step({pulse:false});a.step({pulse:true});assert.ok(!a.events.some(e=>e.name==='pulse'));const b=g({player:{carried:3},shades:[{pos:[3,.8,0]}]});b.step({pulse:true});run(b,119);assert.equal(b.shades[0].state,'stunned');b.step();assert.notEqual(b.shades[0].state,'stunned');});
+test('pulse push stops at static tower wall',()=>{const game=g({player:{pos:[5,6,0],carried:3},shades:[{pos:[2.1,6.8,0]}]},3);game.step({pulse:true});run(game,14);assert.ok(game.shades[0].pos[0]>=2);});
+test('shade detection, lose chase and scenario default wander',()=>{const game=g({shades:[{pos:[10,.8,0]}]});assert.equal(game.shades[0].state,'wander');game.step();assert.equal(game.shades[0].state,'chase');close(game.shades[0].pos[0],10-4/60);game.player.pos=[-20,0,0];game.step();assert.equal(game.shades[0].state,'wander');});
+test('Night 3 shade speed is 4.5',()=>{const game=g({player:{pos:[30,0,0]},shades:[{pos:[40,.8,0]}]},3);game.step();close(game.shades[0].pos[0],40-4.5/60);});
+test('shade hit one per tick, drops half in annulus, recoils, respects invuln',()=>{const game=g({player:{carried:9},shades:[{id:'S2',pos:[0,.8,0]},{id:'S1',pos:[0,.8,0]}]});game.step();assert.equal(game.player.flames,2);assert.equal(game.player.carried,5);assert.equal(game.shades.find(s=>s.id==='S1').state,'recoil');assert.equal(game.motes.length,4);for(const m of game.motes){assert.equal(m.kind,'dropped');assert.equal(m.ttl,480);assert.ok(distance(m.pos,[0,0,0])>=1.5&&distance(m.pos,[0,0,0])<=2.5);}run(game,89);assert.equal(game.player.flames,2);});
+test('contact checks height and invuln snapshot is boolean',()=>{const game=g({player:{pos:[0,3,0],invuln_ticks:2},shades:[{pos:[0,.8,0]}]});assert.equal(game.snapshot().player.invuln,true);game.step();assert.equal(game.player.flames,3);game.step();assert.equal(typeof game.snapshot().player.invuln,'boolean');assert.equal(game.snapshot().player.invuln,false);});
+test('safe zones only lit lamps, eject within 30 ticks and prevent hits',()=>{const game=g({player:{pos:[6,0,0]},lanterns:[{id:'L1',pos:[0,0,0],lit:true}],shades:[{pos:[0,.8,0]}]});run(game,30);assert.ok(distance(game.shades[0].pos,[0,0,0])>=6-1e-6);assert.equal(game.player.flames,3);});
+test('fall ignores invuln, loses all carried once, respawns after 60 ticks',()=>{const game=g({player:{pos:[41,-10.1,0],carried:8,invuln_ticks:999}});game.step();assert.equal(game.player.flames,2);assert.equal(game.player.carried,0);assert.equal(game.respawnTicks,60);assert.equal(game.events.find(e=>e.name==='player_hit').data.lost,8);run(game,59);assert.equal(game.player.flames,2);assert.ok(game.player.pos[1]<-10);game.step();assert.deepEqual(game.player.pos,[0,0,0]);assert.equal(game.invulnTicks,90);});
+test('fall with last flame loses immediately',()=>{const game=g({player:{pos:[41,-11,0],flames:1}});game.step();assert.equal(game.state,'lost');assert.equal(game.events.at(-1).data.reason,'no_flames');assert.equal(game.respawnTicks,0);});
+test('island edge is open; player actually falls',()=>{const game=g({player:{pos:[39.9,0,0]}});run(game,70,{move:[1,0]});assert.equal(game.player.flames,2);});
+test('pause increments tick only, freezes every gameplay timer; rising edges resume',()=>{const game=g({player:{dash_cd_ticks:40,pulse_cd_ticks:50,charm_ticks:100,invuln_ticks:60},time_left_s:10});game.step({pause:true});assert.equal(game.state,'paused');run(game,100,{pause:true});assert.equal(game.simTick,0);assert.equal(game.tick,101);assert.equal(game.dashCD,40);assert.equal(game.timeLeft,10);assert.equal(game.charmTicks,100);game.step({pause:false});game.step({pause:true});assert.equal(game.state,'playing');assert.equal(game.simTick,1);assert.deepEqual(game.events.map(e=>e.name),['resumed','night_start']);});
+test('natural mote points: 20 distinct at setup, no more than available points; schedule 240',()=>{const game=new Game(t,{seed:42,scenario:{random_shades:false}});assert.equal(game.motes.length,20);assert.equal(new Set(game.motes.map(m=>m.pos.join(','))).size,20);run(game,239);assert.equal(game.motes.length,20);game.step();assert.equal(game.motes.length,21);run(game,2160);assert.equal(game.motes.length,24);});
+test('shade spawn 2 at 300, 60 tick harmless spawning then wander/chase',()=>{const game=new Game(t,{seed:2,scenario:{random_motes:false}});run(game,299);assert.equal(game.shades.length,0);game.step();assert.equal(game.shades.length,2);assert.equal(game.shades[0].state,'spawning');run(game,59);assert.equal(game.shades[0].state,'spawning');game.step();assert.equal(game.shades[0].state,'wander');run(game,420);assert.equal(game.shades.length,3);});
+test('bamboo bridge and void geometry; ramps, terraces and tower surfaces',()=>{const m=getMap(2);assert.equal(groundHeight(m,35,0),0);assert.equal(groundHeight(m,35,3),-Infinity);const n=getMap(3);assert.equal(groundHeight(n,0,18),3);assert.equal(groundHeight(n,0,5),6);close(groundHeight(n,27*Math.cos(Math.PI/6),13.5),1.5);});
+test('launch pad retains horizontal launch despite opposing movement and lands on island B',()=>{const game=g({player:{pos:[20,0,18]}},2);game.step({move:[-1,0]});assert.ok(game.player.vel[0]>20);run(game,85,{move:[-1,0]});assert.ok(game.player.pos[0]>48);assert.equal(game.player.grounded,true);});
+test('Night 3 launch pad lands on upper tier',()=>{const game=g({player:{pos:[0,3,13]}},3);game.step();run(game,60);assert.equal(game.player.grounded,true);close(game.player.pos[1],6);});
+test('dash during launch follows actual locked launch direction despite opposing keys',()=>{const game=g({player:{pos:[20,0,18]}},2);game.step();game.step({move:[-1,0],dash:true});assert.ok(game.player.vel[0]>0);assert.ok(game.player.vel[2]<0);close(Math.hypot(game.player.vel[0],game.player.vel[2]),14);});
+test('cannot walk through upper terrace wall or tower',()=>{const game=g({player:{pos:[0,0,24.1]}},3);run(game,10,{move:[0,-1]});assert.ok(game.player.pos[2]>=24);const b=g({player:{pos:[2.1,6,0]}},3);run(b,10,{move:[-1,0]});assert.ok(b.player.pos[0]>=2);});
+test('charm refresh, speed 7.2, zero dash cooldown, respawn 2700 ticks',()=>{const game=g({player:{pos:[35,0,0]},charms:[{id:'C1',pos:[35,0,0]}]},2);game.step();assert.equal(game.charmTicks,600);assert.equal(game.charms[0].respawnTicks,2700);game.step({move:[1,0]});close(game.player.pos[0],35.12);game.step({dash:true});assert.equal(game.dashCD,0);run(game,11,{dash:true});game.step({dash:false});game.step({dash:true});assert.ok(game.events.some(e=>e.name==='dash'));game.player.pos=[0,0,0];run(game,2685,{dash:false,move:[0,0]});assert.equal(game.charms[0].available,true);});
+test('drifter spawn on 1200 tick and maximum 2',()=>{const game=new Game(t,{night:2,scenario:{random_motes:false,random_shades:false}});run(game,1199);assert.equal(game.drifters.length,0);game.step();assert.equal(game.drifters.length,1);run(game,2400);assert.equal(game.drifters.length,2);});
+test('drifter steals before shade hit even while invulnerable/safe',()=>{const game=g({player:{carried:9},drifters:[{id:'D1',pos:[0,.8,0],state:'chase'}],shades:[{pos:[0,.8,0]}]},2);game.step();const steal=game.events.findIndex(e=>e.name==='drifter_steal'),hit=game.events.findIndex(e=>e.name==='player_hit');assert.ok(steal>=0&&hit>steal);assert.equal(game.player.carried,3);const b=g({player:{carried:6,invuln_ticks:100},lanterns:[{id:'L1',pos:[0,0,0],lit:true}],drifters:[{pos:[0,.8,0],state:'chase'}]},2);b.step();assert.equal(b.player.carried,3);});
+test('drifter chase threshold and pulse on chase/flee return stolen motes',()=>{const game=g({player:{carried:4},drifters:[{id:'D1',pos:[3,.8,0]}]},2);game.step();assert.equal(game.drifters[0].state,'idle');game.player.carried=8;game.step();assert.equal(game.drifters[0].state,'chase');game.step({pulse:true});assert.equal(game.drifters[0].state,'flee');assert.equal(game.drifters[0].stolen,0);const b=g({player:{carried:3},drifters:[{id:'D1',pos:[2,.8,0],state:'flee',stolen:3}]},2);b.step({pulse:true});assert.equal(b.motes.length,3);assert.ok(b.events.some(e=>e.name==='drifter_drop'));assert.equal(b.drifters[0].stolen,0);run(b,120);assert.equal(b.drifters.length,0);});
+test('dropped TTL expires exactly, pause freezes TTL',()=>{const game=g();game.dropMotes(1,[8,0,0]);game.step({pause:true});run(game,500);assert.equal(game.motes[0].ttl,480);game.step({pause:false});game.step({pause:true});run(game,478,{pause:false});assert.equal(game.motes.length,1);game.step();assert.equal(game.motes.length,0);});
+test('wind warning 2 seconds, gust 5 seconds, deterministic direction and push',()=>{const game=new Game(t,{night:3,scenario:{random_motes:false,random_shades:false,random_drifters:false}});run(game,1679);assert.equal(game.wind.warning,false);game.step();assert.equal(game.wind.warning,true);run(game,120);assert.equal(game.wind.active,true);const p=[...game.player.pos];game.step();close(distance(p,game.player.pos),2/60);run(game,298);assert.equal(game.wind.active,true);game.step();assert.equal(game.wind.active,false);});
+test('victory on dawn tick, score includes deposit and win bonus, no reward for setup lamps',()=>{const game=g({player:{carried:10},time_left_s:1/60,lanterns:[{id:'L1',pos:[0,0,0]},...['L2','L3','L4','L5'].map(id=>({id,lit:true}))]});game.step({interact:true});assert.equal(game.state,'won');assert.equal(game.score,350);assert.equal(game.end().score,350);});
+test('no_flames always wins priority over all_lit and dawn',()=>{const game=g({player:{flames:0},time_left_s:0,lanterns:['L1','L2','L3','L4','L5'].map(id=>({id,lit:true}))});game.step();assert.equal(game.events.at(-1).data.reason,'no_flames');assert.equal(game.score,0);});
+test('snapshots contain v1.1 fields and three-decimal coordinates',()=>{const game=g({player:{pos:[.123456,0,0]}});const s=game.snapshot();assert.equal(s.player.pos[0],.123);for(const k of ['vel','grounded','invuln','dash_cd_s','pulse_cd_s','charm_s'])assert.ok(k in s.player);for(const k of ['night','wind','motes','drifters','charms'])assert.ok(k in s);});
+test('same seed/scenario/inputs deterministic including all entity IDs',()=>{const execute=()=>{const game=new Game(t,{night:2,seed:7});const result=[game.snapshot()];for(let i=0;i<1800&&!['lost','won'].includes(game.state);i++){result.push(...game.step({move:[.2,0],dash:i%120===0}));if(i%60===0)result.push(game.snapshot());}return JSON.stringify(result);};assert.equal(execute(),execute());});
+test('walk smoothly up standard ramp to Y=3',()=>{const a=Math.PI/6,game=g({player:{pos:[30*Math.cos(a),0,30*Math.sin(a)]}},3);run(game,60,{move:[-Math.cos(a),-Math.sin(a)]});close(game.player.pos[1],3);assert.equal(game.player.grounded,true);});
+test('recoil moves exactly two metres over 60 subsequent ticks',()=>{const game=g({shades:[{pos:[0,.8,0]}]});game.step();run(game,60);close(game.shades[0].pos[0],2);});
+test('air dash reports zero vertical velocity and freezes Y',()=>{const game=g();game.step({jump:true});game.step({dash:true});const y=game.player.pos[1];assert.equal(game.snapshot().player.vel[1],0);run(game,11);close(game.player.pos[1],y);});
+test('campaign counts only won nights and replaces repeated completions',()=>{const c=new Campaign();assert.equal(c.complete({night:1,state:'lost',score:500}),false);assert.equal(c.total,0);c.complete({night:1,state:'won',score:700});c.complete({night:1,state:'won',score:710});c.next();assert.equal(c.night,2);assert.equal(c.total,710);c.complete({night:2,state:'won',score:800});assert.equal(c.total,1510);c.reset();assert.equal(c.total,0);});
+test('invalid schemas rejected, v1.1 scenario extensions accepted',()=>{for(const input of [{},{frames:[{tick:0},{tick:0}]},{frames:[{tick:0,move:[2,0]}]},{frames:[{tick:0,pause:1}]}])assert.throws(()=>validateInputs(input),DataError);assert.throws(()=>validateScenario({player:{carried:11}},t),DataError);assert.throws(()=>validateScenario({shades:[{pos:[0,0,0],state:'foo'}]},t),DataError);assert.doesNotThrow(()=>g({player:{invuln_ticks:10},shades:[{pos:[0,0,0],state:'stunned',state_ticks_left:20}],drifters:[],charms:[]}));});
+test('real CLI handles night 3, pause snapshots, event order, invalid data exit 2',()=>{
+ const temp=mkdtempSync(path.join(os.tmpdir(),'lantern-v11-'));try{const sc=path.join(temp,'s.json'),inp=path.join(temp,'i.json'),out=path.join(temp,'o.jsonl');writeFileSync(sc,JSON.stringify({random_motes:false,random_shades:false,random_drifters:false,wind_enabled:false}));writeFileSync(inp,JSON.stringify({frames:[{tick:0,pause:true},{tick:2,pause:false},{tick:3,pause:true}]}));
+ const args=['src/headless.mjs','--seed','1','--night','3','--ticks','6','--scenario',sc,'--inputs',inp,'--snapshot-every','1','--out',out];const p=spawnSync(process.execPath,args,{encoding:'utf8'});assert.equal(p.status,0,p.stderr);const lines=readFileSync(out,'utf8').trim().split('\n').map(JSON.parse);assert.equal(lines[0].tick,0);assert.equal(lines[1].name,'paused');assert.equal(lines[2].state,'paused');assert.equal(lines.at(-1).type,'end');assert.equal(lines.at(-1).ticks,6);assert.equal(lines.at(-2).sim_tick,3);writeFileSync(inp,'{bad');assert.equal(spawnSync(process.execPath,args).status,2);
+ }finally{rmSync(temp,{recursive:true,force:true});}
 });

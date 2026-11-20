@@ -1,40 +1,30 @@
-import { spawnSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { createHash } from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import {mkdirSync,readFileSync,writeFileSync,readdirSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {fileURLToPath} from 'node:url';
 import os from 'node:os';
-import { fileURLToPath } from 'node:url';
-
-const root=new URL('../',import.meta.url);
-process.chdir(fileURLToPath(root));
-mkdirSync('docs/proof/phase-1',{recursive:true});
-const log=[];
-function command(args) {
-  const start=performance.now();
-  const result=spawnSync(process.execPath,args,{encoding:'utf8',maxBuffer:20*1024*1024});
-  const item={command:['node',...args],exit_code:result.status,duration_ms:Math.round(performance.now()-start),stdout:result.stdout,stderr:result.stderr};
-  log.push(item); process.stdout.write(result.stdout ?? ''); process.stderr.write(result.stderr ?? '');
-  if(result.status!==0) {
-    writeFileSync('docs/proof/phase-1/verification.json',JSON.stringify({passed:false,steps:log},null,2)+'\n');
-    process.exit(result.status || 1);
-  }
+process.chdir(fileURLToPath(new URL('../',import.meta.url)));
+const dir='docs/proof/phase-2';mkdirSync(dir,{recursive:true});const steps=[];
+function command(args){const start=performance.now(),p=spawnSync(process.execPath,args,{encoding:'utf8',maxBuffer:20*1024*1024}),entry={command:['node',...args],exit_code:p.status,duration_ms:Math.round(performance.now()-start),stdout:p.stdout,stderr:p.stderr};steps.push(entry);process.stdout.write(p.stdout??'');process.stderr.write(p.stderr??'');if(p.status!==0){writeFileSync(`${dir}/verification.json`,JSON.stringify({passed:false,steps},null,2));process.exit(p.status||1);}return entry;}
+command(['--test']);command(['scripts/build.mjs']);
+const cases=[['dash',1,180,'dash.inputs'],['pulse',1,180,'pulse.inputs'],['fall',1,120],['launch',2,86],['charm',2,2800],['drifter',2,300],['drifter-return',2,150,'pulse.inputs'],['wind',3,2160]];
+for(const[name,night,ticks,input]of cases)command(['src/headless.mjs','--seed','12','--night',String(night),'--scenario',`tests/scenarios/phase-2/${name}.json`,...(input?['--inputs',`tests/scenarios/phase-2/${input}.json`]:[]),'--ticks',String(ticks),'--snapshot-every','10','--out',`${dir}/${name}.jsonl`]);
+const read=name=>readFileSync(`${dir}/${name}.jsonl`,'utf8').trim().split('\n').map(JSON.parse);
+const expect=(ok,message)=>{if(!ok)throw new Error(message);};
+for(const night of [1,2,3]){
+ const scenario=night===1?'tests/scenarios/last-lantern.json':`tests/scenarios/phase-2/win-night-${night}.json`;
+ command(['src/headless.mjs','--seed','12','--night',String(night),'--scenario',scenario,'--inputs','tests/scenarios/last-lantern.inputs.json','--ticks','60','--out',`${dir}/won-night-${night}.jsonl`]);
+ expect(read(`won-night-${night}`).at(-1).state==='won',`Night ${night} win fixture failed`);
 }
-command(['--test']);
-command(['scripts/build.mjs']);
-command(['scripts/playthrough.mjs']);
-command(['src/headless.mjs','--seed','12','--night','1','--inputs','docs/proof/phase-1/playthrough.inputs.json','--ticks','18000','--snapshot-every','60','--out','docs/proof/phase-1/playthrough.jsonl']);
-const playthrough=readFileSync('docs/proof/phase-1/playthrough.jsonl','utf8').trim().split('\n').map(JSON.parse).at(-1);
-if(playthrough.state!=='won') throw new Error('Normal-world playthrough did not win');
-const base=['src/headless.mjs','--seed','12','--night','1','--ticks','1200'];
-command([...base,'--out','docs/proof/phase-1/replay-a.jsonl']);
-command([...base,'--out','docs/proof/phase-1/replay-b.jsonl']);
-const a=readFileSync('docs/proof/phase-1/replay-a.jsonl'),b=readFileSync('docs/proof/phase-1/replay-b.jsonl');
-if(!a.equals(b)) throw new Error('Determinism check FAILED');
-command(['src/headless.mjs','--seed','12','--night','1','--scenario','tests/scenarios/last-lantern.json','--inputs','tests/scenarios/last-lantern.inputs.json','--ticks','60','--out','docs/proof/phase-1/won.jsonl']);
-command(['src/headless.mjs','--seed','12','--night','1','--scenario','tests/scenarios/contact.json','--ticks','600','--out','docs/proof/phase-1/lost.jsonl']);
-const sourceFiles=['game.contract.json','src/core/game.mjs','src/core/validate.mjs','src/headless.mjs','web/main.mjs','web/style.css','index.html'];
-const sha256=data=>createHash('sha256').update(data).digest('hex');
-const report={passed:true,generated_at:new Date().toISOString(),node:process.version,platform:process.platform,arch:process.arch,cpu:os.cpus()[0]?.model,
-  determinism:{identical:true,sha256:sha256(a)},source_sha256:Object.fromEntries(sourceFiles.map(f=>[f,sha256(readFileSync(f))])),
-  browser_visual_check:'Separate browser-qa.json and screenshots; not executed by this script',steps:log};
-writeFileSync('docs/proof/phase-1/verification.json',JSON.stringify(report,null,2)+'\n');
-console.log('Verification passed. Real outputs saved in docs/proof/phase-1/.');
+expect(read('dash').some(e=>e.name==='dash')&&read('dash').some(s=>s.state==='paused'),'Dash/pause scenario failed');
+expect(read('fall').some(e=>e.name==='player_hit'&&e.data.by==='fall'),'Fall scenario failed');
+expect(read('charm').some(e=>e.name==='charm_picked'),'Charm scenario failed');
+expect(read('drifter').some(e=>e.name==='drifter_steal'),'Drifter steal scenario failed');
+expect(read('drifter-return').some(e=>e.name==='drifter_drop'),'Drifter return scenario failed');
+expect(read('wind').some(s=>s.type==='snapshot'&&s.wind.active),'Wind scenario failed');
+const replay=['src/headless.mjs','--seed','77','--night','2','--ticks','3600','--snapshot-every','60'];
+command([...replay,'--out',`${dir}/replay-a.jsonl`]);command([...replay,'--out',`${dir}/replay-b.jsonl`]);const a=readFileSync(`${dir}/replay-a.jsonl`);expect(a.equals(readFileSync(`${dir}/replay-b.jsonl`)),'Deterministic replay differs');
+const benchmark=command(['src/headless.mjs','--seed','12','--night','3','--scenario','tests/scenarios/phase-2/benchmark.json','--ticks','21600','--snapshot-every','60','--out',`${dir}/benchmark.jsonl`]);
+expect(read('benchmark').at(-1).ticks===21600,'Benchmark did not simulate full night');expect(benchmark.duration_ms<=30000,'Headless benchmark exceeds 30s');
+const sha=data=>createHash('sha256').update(data).digest('hex');const sourceFiles=['game.contract.json','src/headless.mjs','index.html',...readdirSync('src/core').map(f=>'src/core/'+f),...readdirSync('web').map(f=>'web/'+f)];
+writeFileSync(`${dir}/verification.json`,JSON.stringify({passed:true,generated_at:new Date().toISOString(),node:process.version,platform:process.platform,cpu:os.cpus()[0]?.model,determinism:{identical:true,sha256:sha(a)},headless_21600_ticks_ms:benchmark.duration_ms,benchmark_scenario:'Full Night 3, natural enemies enabled; initial invulnerability avoids early death, wind disabled to hold position',source_sha256:Object.fromEntries(sourceFiles.map(f=>[f,sha(readFileSync(f))])),steps},null,2)+'\n');console.log('Phase 2 verification passed; proof saved to '+dir);
