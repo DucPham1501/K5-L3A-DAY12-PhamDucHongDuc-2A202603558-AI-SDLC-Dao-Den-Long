@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-11-20T17:12:33.261Z",
+  "checks": [
+    {
+      "label": "clean-install",
+      "folder": "C:\\Users\\Admin\\AppData\\Local\\Temp\\lantern-submission-acb56fc72b0a40689d1c62ff9018cde6",
+      "passed": true,
+      "http": 200,
+      "level_selector": true,
+      "headless_night": 3,
+      "headless_records": 15,
+      "leaderboard": "isolated empty board + CLI export",
+      "source_matches": true
+    },
+    {
+      "label": "release-zip",
+      "folder": "C:\\Users\\Admin\\AppData\\Local\\Temp\\lantern-release-mjeCF5\\dao-den-long-v1.0.0",
+      "passed": true,
+      "http": 200,
+      "level_selector": true,
+      "headless_night": 3,
+      "headless_records": 15,
+      "leaderboard": "isolated empty board + CLI export",
+      "source_matches": true
+    }
+  ],
+  "note": "Clean local clone overlaid with current working source before npm ci/build; release ZIP extracted separately. Temporary folders kept for inspection."
+}

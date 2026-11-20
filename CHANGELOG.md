@@ -10,6 +10,8 @@
 
 ### Mới
 
+- Menu chọn trực tiếp Level 1–3; lượt mới reset điểm, chỉ tính các Đêm thực sự thắng. Bổ sung video demo người làm bài quay tại `docs/demo/demo.mp4`.
+
 - Benchmark chuẩn: cửa sổ 1280×720, tắt vsync, cảnh Đêm 1 với 200 Bóng Mực wander, 100 đom đóm, L1–L3 fuel 100, camera bay vòng 30 m/15 s ngược chiều kim đồng hồ. Đo avg_fps, p1_low_fps, p95, load_ms từ lúc tiến trình bắt đầu, và RAM đỉnh của cây tiến trình trình duyệt.
 - Soak 10 Đêm trong một tiến trình với input ngẫu nhiên theo seed; đo RSS lúc đầu và lúc cuối.
 - Bảng xếp hạng cục bộ lưu trên đĩa: nhập tên sau Bình Minh hoặc sau khi thua, top 10, có màn hình riêng từ menu, CLI `--export-leaderboard`, nhận tên tiếng Việt có dấu.

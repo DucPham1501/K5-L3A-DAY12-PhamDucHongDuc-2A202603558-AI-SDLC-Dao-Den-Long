@@ -1,5 +1,11 @@
 # Phase 4: Bình minh, phát hành v1.0.0 (Contract v1.3)
 
+## Bổ sung menu chọn level
+
+Menu có nút **Chọn level** cho Đêm 1–3; chọn một Đêm sẽ reset campaign rồi bắt đầu từ Đêm đó và tiếp tục tới Đêm 3. Không đánh dấu thắng hay cấp điểm cho các Đêm bỏ qua. Màn Bình Minh hiển thị đúng số Đêm thực sự đã thắng. Simulation, contract và các tag cũ giữ nguyên.
+
+Browser QA sử dụng các nút chọn level thật để kiểm tra cả ba bản đồ, điểm và số Đêm thắng khởi đầu bằng 0, tick gameplay ở màn giới thiệu bằng 0. Lần QA đầu thất bại ở kiểm tra HUD cảnh báo gió: caption đã có nhưng HUD cập nhật theo chu kỳ nên còn trống tại thời điểm assert. Đã thêm chờ điều kiện HUD hiển thị cảnh báo trước khi assert; kết quả lần chạy lại được ghi tự động trong `docs/proof/phase-4/browser-qa.json`.
+
 Trạng thái: đã triển khai và kiểm chứng local. Luật gameplay v1.2, headless và các tag `phase-1..3` giữ nguyên. Checklist bàn giao: [../submission-phase-4.md](../submission-phase-4.md). Retro: [retro.md](retro.md).
 
 ## Tiêu chí nghiệm thu và bằng chứng

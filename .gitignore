@@ -6,3 +6,5 @@ dist/
 *.log
 .DS_Store
 release/
+/game_demo.mp4
+/docs/demo/video-review.jpg

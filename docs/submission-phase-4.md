@@ -11,7 +11,7 @@
 - [x] Bằng chứng: [docs/notes/phase-4.md](notes/phase-4.md), [verification.json](proof/phase-4/verification.json), [browser-qa.json](proof/phase-4/browser-qa.json) và ảnh chụp trong `docs/proof/phase-4/`.
 - [x] Retro: [docs/notes/retro.md](notes/retro.md).
 - [x] Gói release `dao-den-long-v1.0.0.zip` (`npm run package`), đã thử chạy từ thư mục giải nén.
-- [ ] Video demo `demo.mp4` dưới 5 phút (chơi thật, chạy test/headless/bench): người làm bài tự quay rồi upload lên Release v1.0.0.
+- [x] Video người làm bài cung cấp: [demo.mp4](demo/demo.mp4), 3 phút 41,5 giây; có chơi ba Đêm, kết quả verify, soak, cảnh benchmark và lịch sử Git/ghi chép. Bản gốc `game_demo.mp4` trên 100 MB được giữ local; bản nén đặt đúng đường dẫn trong repo, không cắt nội dung.
 - [ ] Đo trên máy chấm: giảng viên thực hiện. Số trong repo chỉ để tham khảo.
 
 Không tự nhận đã đạt test ẩn hay CI từ xa khi chưa xem kết quả trên GitHub.

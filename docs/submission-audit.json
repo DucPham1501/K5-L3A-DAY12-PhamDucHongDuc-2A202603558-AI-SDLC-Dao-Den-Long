@@ -1,0 +1,74 @@
+{
+  "generated_at": "2026-11-20T17:10:27.284Z",
+  "phases": [
+    {
+      "tag": "phase-1",
+      "commit": "7fef2e10fb7f965d768ef04837c3596ab204c84a",
+      "verification_passed": true,
+      "browser_passed": true,
+      "source_hash_mismatches": []
+    },
+    {
+      "tag": "phase-2",
+      "commit": "e1b1536577ae5232a64fd28be9443bfdfdea352f",
+      "verification_passed": true,
+      "browser_passed": true,
+      "source_hash_mismatches": []
+    },
+    {
+      "tag": "phase-3",
+      "commit": "9616c12003d322154b7a15248a2e48aad700eae6",
+      "verification_passed": true,
+      "browser_passed": true,
+      "source_hash_mismatches": []
+    },
+    {
+      "tag": "phase-4",
+      "commit": "63e4cc44e94a06147453943408887196ffa232dc",
+      "verification_passed": true,
+      "browser_passed": true,
+      "source_hash_mismatches": []
+    }
+  ],
+  "history_scan": {
+    "commits_checked": 13,
+    "sensitive_paths": [],
+    "suspicious_file_references": [],
+    "scope": "Common credential filenames and key patterns in reachable Git history; heuristic, not a guarantee."
+  },
+  "current_source_hash_mismatches": [],
+  "required_files": [
+    {
+      "file": "README.md",
+      "exists": true
+    },
+    {
+      "file": "LICENSE",
+      "exists": true
+    },
+    {
+      "file": "CREDITS.md",
+      "exists": true
+    },
+    {
+      "file": "CHANGELOG.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "exists": true
+    },
+    {
+      "file": "game.contract.json",
+      "exists": true
+    },
+    {
+      "file": "docs/notes/retro.md",
+      "exists": true
+    },
+    {
+      "file": "docs/demo/demo.mp4",
+      "exists": true
+    }
+  ]
+}

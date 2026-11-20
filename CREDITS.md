@@ -7,6 +7,6 @@
 - Three.js 0.170.0: https://github.com/mrdoob/three.js — MIT; giữ thông báo bản quyền và giấy phép trong bản build.
 - playwright-core: https://github.com/microsoft/playwright — Apache-2.0; chỉ dùng cho kiểm thử, benchmark và quay video demo, không đóng gói vào game.
 - Microsoft Edge / Chromium: trình duyệt dùng để chạy benchmark và QA (không phân phối kèm game).
-- FFmpeg (chỉ dùng nếu cần chuyển đổi hoặc nén video demo), không đóng gói kèm.
+- Video demo do người làm bài cung cấp. FFmpeg dùng để kiểm tra và nén H.264/AAC, giữ nguyên nội dung và thời lượng; không đóng gói FFmpeg kèm game.
 - Font hệ thống Segoe UI/system-ui, Georgia; không phân phối file font. Icon là ký tự Unicode.
 - Không dùng asset, nhân vật, nhạc hoặc mô hình từ game/phim khác.

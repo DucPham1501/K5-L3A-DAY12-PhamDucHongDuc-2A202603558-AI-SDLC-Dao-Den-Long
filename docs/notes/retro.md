@@ -2,6 +2,8 @@
 
 Phạm Đức Hồng Đức · 2A202603558 · bốn phase, từ Contract v1.0 tới v1.3 / Release v1.0.0.
 
+Bổ sung bàn giao: người làm bài đã cung cấp video chơi thực tế; bản nén ở `docs/demo/demo.mp4` dài 221,5 giây. Codex thêm menu chọn Đêm theo yêu cầu, kiểm tra lại verify/browser QA và chuẩn bị hồ sơ nộp. `scripts/submission-audit.mjs` kiểm tra hash tại tag và quét mẫu khóa phổ biến trong lịch sử; `scripts/submission-smoke.mjs` kiểm tra bản cài sạch và ZIP với leaderboard tạm. Không có telemetry token riêng cho phiên bổ sung nên không tự nhận số token/chi phí chính xác. Việc người làm bài chơi trong video chưa thay thế một reviewer độc lập.
+
 ## 1. Tổng hợp Evaluation bốn phase
 
 | Phase | Kết quả chính | Bằng chứng | Điều chưa đạt / ghi trung thực |

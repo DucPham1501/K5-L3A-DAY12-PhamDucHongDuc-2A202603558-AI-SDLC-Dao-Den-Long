@@ -1,0 +1,18 @@
+Đảo Đèn Lồng v1.0.0
+
+Game 3D góc nhìn thứ ba, Test Contract v1.3, phát triển qua bốn phase.
+Menu cho chọn Đêm 1, 2 hoặc 3; mỗi lượt mới chỉ tính điểm các Đêm thực sự thắng.
+
+Bản chạy: giải nén dao-den-long-v1.0.0.zip, cài Node.js 20+ rồi chạy
+node scripts/serve.mjs
+Mở http://127.0.0.1:4173. Không cần npm install với bản ZIP.
+
+Video demo: demo.mp4, 3 phút 41,5 giây; bản trong repo tại docs/demo/demo.mp4.
+
+Kiểm chứng local: 81/81 test, replay tất định, headless, soak và build đạt;
+browser QA đạt; đã thử bản cài sạch và bản ZIP giải nén với leaderboard tạm.
+bench.json và soak.json là số đo thật trên máy người làm bài, không thay số máy chấm.
+
+Các tag phase-1 đến phase-4 lưu lịch sử ban đầu; phần chọn level/video được
+bổ sung trong commit bàn giao sau phase-4, không di chuyển các tag cũ.
+Không khẳng định đã đạt test ẩn hoặc đã được người review độc lập chơi thử.

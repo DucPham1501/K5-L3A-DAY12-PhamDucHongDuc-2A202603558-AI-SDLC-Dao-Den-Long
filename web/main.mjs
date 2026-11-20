@@ -58,7 +58,11 @@ function modal(mode,kicker,title,copy,actionList,detail=''){
 function prepare(night){sessionRunning=false;game=new Game(tuning,{night,seed:SEED});world.load(game.map);yaw=0;accumulator=0;lastSecond=Math.ceil(game.timeLeft);lastWind=false;lastWindActive=false;queuedDash=false;queuedPulse=false;clearIndicators();updateHUD();}
 function menu(){
  sessionRunning=false;
- $('hud').hidden=true;modal('menu','MỘT CHÚT SÁNG, MỘT MIỀN BÌNH YÊN','Đảo Đèn Lồng','Ba hòn đảo. Một người giữ đèn nhỏ. Cùng Mây mang ánh sáng trở về trước bình minh.',[['Bắt đầu hành trình',()=>{campaign.reset();intro();}],['Bảng xếp hạng',()=>showLeaderboard(menu),true],['Cài đặt',()=>showSettings('menu'),true],['Hướng dẫn',()=>help('menu'),true]],'<div class="detail">Đảo Bến · Đảo Cau · Đảo Chuông<br>Thu gom đom đóm, thắp đèn và giữ đủ đèn sáng tới bình minh.</div>');
+ $('hud').hidden=true;modal('menu','MỘT CHÚT SÁNG, MỘT MIỀN BÌNH YÊN','Đảo Đèn Lồng','Ba hòn đảo. Một người giữ đèn nhỏ. Cùng Mây mang ánh sáng trở về trước bình minh.',[['Bắt đầu hành trình',()=>{campaign.reset();intro();}],['Chọn level',selectLevel,true],['Bảng xếp hạng',()=>showLeaderboard(menu),true],['Cài đặt',()=>showSettings('menu'),true],['Hướng dẫn',()=>help('menu'),true]],'<div class="detail">Đảo Bến · Đảo Cau · Đảo Chuông<br>Thu gom đom đóm, thắp đèn và giữ đủ đèn sáng tới bình minh.</div>');
+}
+function selectLevel(){
+ const levels=['Đảo Bến','Đảo Cau','Đảo Chuông'];
+ modal('levels','BA HÒN ĐẢO ĐANG ĐỢI','Chọn level','Bắt đầu một lượt mới tại Đêm bạn chọn, rồi tiếp tục tới Đêm 3. Điểm và số Đêm thắng chỉ tính từ lượt này.',[...levels.map((name,i)=>[`Level ${i+1} · Đêm ${i+1} · ${name}`,()=>{campaign.reset();campaign.night=i+1;intro();}]),['Về menu',menu,true]]);
 }
 function intro(){prepare(campaign.night);$('hud').hidden=true;modal('intro',`ĐÊM ${game.night} · LỜI ÔNG ĐĂNG`,game.map.name,greetings[game.night],[[`Vào Đêm ${game.night}`,start],['Về menu',menu,true]],`<div class="detail">Giữ ít nhất ${game.requiredLit}/${game.lanterns.length} đèn sáng tới bình minh · ${game.initialTime} giây · 3 Ngọn Lửa<br>Đèn cháy 100 giây nếu không châm. Dưới 30 dầu mất vùng an toàn. Thắp lại cần 5 đom đóm.</div>`);}
 async function start(){await sound.start();sessionRunning=true;screen='playing';$('overlay').hidden=true;$('hud').hidden=false;sound.setPlaying(true);accumulator=0;last=performance.now();}
@@ -103,7 +107,7 @@ function nameForm(){const wrap=document.createElement('div');wrap.className='det
  wrap.append(label,form,message,board);return wrap;}
 
 function result(){sound.setPlaying(false);const won=game.state==='won';sound.effect(won?'won':'lost');if(won)campaign.complete(game);clearIndicators();
- if(won&&game.night===3){modal('dawn','BA HÒN ĐẢO ĐÃ THỨC GIẤC','Bình Minh','Ông Đăng: “Con thấy không, những đốm sáng nhỏ đã giữ lại cả một bầu trời.”',[['Hành trình mới',()=>{campaign.reset();intro();}],['Bảng xếp hạng',()=>showLeaderboard(menu),true],['Về menu',menu,true]],`<div class="result-number">${campaign.total.toLocaleString('vi-VN')}</div><p>Tổng điểm ba Đêm đã thắng</p>`);$('modal-detail').append(nameForm());return;}
+ if(won&&game.night===3){modal('dawn',campaign.nightsWon===3?'BA HÒN ĐẢO ĐÃ THỨC GIẤC':'ÁNH SÁNG ĐÃ TRỞ VỀ','Bình Minh','Ông Đăng: “Con thấy không, những đốm sáng nhỏ đã giữ lại cả một bầu trời.”',[['Hành trình mới',()=>{campaign.reset();intro();}],['Bảng xếp hạng',()=>showLeaderboard(menu),true],['Về menu',menu,true]],`<div class="result-number">${campaign.total.toLocaleString('vi-VN')}</div><p>Tổng điểm ${campaign.nightsWon} Đêm đã thắng</p>`);$('modal-detail').append(nameForm());return;}
  const reason=won?'Bạn đã giữ đủ đèn sáng tới bình minh. Một hòn đảo khác đang chờ Mây.':game.player.flames<=0?'Mây đã cạn Ngọn Lửa. Hãy tận dụng đèn đủ dầu, lướt và tỏa sáng.':`Bình minh đã tới nhưng chưa đủ ${game.requiredLit} đèn sáng. Hãy châm dầu trước khi đèn tắt.`;
  modal('result',`KẾT QUẢ ĐÊM ${game.night}`,won?'Một hòn đảo đã sáng.':'Ánh sáng vẫn đang đợi.',reason,won?[[`Đêm tiếp theo`,()=>{campaign.next();intro();}],['Về menu',menu,true]]:[['Chơi lại Đêm',()=>{prepare(campaign.night);start();}],['Về menu',menu,true]],`<div class="result-number">${game.score}</div><p>Điểm Đêm này · Tổng đã thắng: ${campaign.total} · ${campaign.nightsWon}/3 Đêm</p>`);
  if(!won)$('modal-detail').append(nameForm());

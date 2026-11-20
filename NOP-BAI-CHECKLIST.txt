@@ -1,0 +1,62 @@
+KIỂM TRA BÀI NỘP ĐẢO ĐÈN LỒNG
+============================
+Repo cần nộp lên LMS:
+https://github.com/DucPham1501/K5-L3A-DAY12-PhamDucHongDuc-2A202603558-AI-SDLC-Dao-Den-Long
+
+A. ĐÃ CHUẨN BỊ VÀ KIỂM TRA LOCAL
+- Video: docs/demo/demo.mp4; 221,5 giây (3 phút 41,5 giây), khoảng 24,3 MB.
+- Video có chơi ba Đêm, kết quả verify/soak, cảnh benchmark, Git và ghi chép.
+- Link video đặt ở đầu README. Bản gốc game_demo.mp4 giữ local, đã ignore vì >100 MB.
+- Mã nguồn, game.contract.json, headless, README, CREDITS, LICENSE, CHANGELOG đầy đủ.
+- Có AGENTS.md, script kiểm chứng và GitHub Actions trong lịch sử Git.
+- Có giả định, tiêu chí, evaluation, nhật ký AI/token ước tính và retro của bốn phase.
+- Bằng chứng tại bốn tag local đều có passed=true; hash mã nguồn khớp.
+- Verify mới đạt 81/81 test, build, replay, headless, soak và export leaderboard.
+- Browser QA mới nhất passed=true; ba bản đồ/menu chọn level và luồng UI đã kiểm tra.
+- Cài sạch bằng npm ci + npm run build tại thư mục clone tạm đã đạt.
+- ZIP đã đóng gói lại với menu chọn level và đã giải nén chạy thử HTTP/headless/export.
+- Quét lịch sử Git theo các mẫu key phổ biến và tên file nhạy cảm: chưa thấy phát hiện.
+  Đây là kiểm tra theo mẫu, không bảo đảm phát hiện mọi loại bí mật.
+
+Chi tiết tự động: docs/submission-audit.json và docs/submission-smoke.json.
+Kiểm chứng gameplay: docs/proof/phase-4/verification.json và browser-qa.json.
+
+B. GITHUB CẦN CHỐT
+Kết quả kiểm tra remote khi chuẩn bị hồ sơ:
+- Repo Public: đã xác nhận bằng GitHub API không đăng nhập.
+- main remote: 63e4cc44e94a06147453943408887196ffa232dc.
+- Tag remote: mới có phase-1; phase-2/3/4 hiện có ở local, cần push đúng tag cũ.
+- Chưa có GitHub Release; cần tạo v1.0.0 với ZIP chạy được.
+- CI của commit Phase 4 cũ đã success; CI bản bổ sung chưa xác nhận.
+- GitHub CLI báo token không hợp lệ. Người dùng cần tự đăng nhập lại:
+
+gh auth login -h github.com
+
+Không gửi mật khẩu, mã truy cập hoặc token vào chat.
+Không di chuyển/xóa tag cũ, không giả mạo thời gian commit.
+
+Sau khi đăng nhập, quy trình còn lại:
+1. Commit các thay đổi bàn giao và video đã nén; không commit game_demo.mp4 gốc.
+2. Push main và các tag local phase-2, phase-3, phase-4.
+3. Tạo Release v1.0.0 ở commit bản bàn giao, đính kèm:
+   - release/dao-den-long-v1.0.0.zip
+   - docs/demo/demo.mp4 (tùy chọn thêm vào Release; đã có bản trong repo).
+4. Đợi GitHub Actions của commit mới chạy xong và xác nhận success.
+5. Mở repo, Tags, Release, link video ở đầu README khi chưa đăng nhập.
+6. Gửi link repo Public lên LMS và kiểm tra LMS ghi nhận nộp thành công.
+
+C. HẠN VÀ CÁC MỤC KHÔNG THỂ TỰ NHẬN ĐÃ XONG
+- Theo SUBMISSION.md, ca chiều mặc định nộp link trước 11:59 trưa hôm sau;
+  thông báo trực tiếp của Coach được ưu tiên.
+- Hạn tag/Release/video trong tài liệu là cuối 4 giờ lab, khác hạn gửi link LMS.
+  Cập nhật sau mốc phase có thể không được tính nếu chưa được Coach cho phép.
+- Chưa xác nhận người review độc lập chơi thử.
+- Test ẩn và benchmark trên máy chấm: giảng viên thực hiện.
+- Chưa thể đánh dấu đã nộp LMS nếu chưa có xác nhận thực tế.
+
+D. LỆNH KIỂM TRA LẠI (CHẠY TẠI THƯ MỤC PROJECT)
+npm run verify
+npm run test:browser
+node scripts/submission-audit.mjs
+
+Không sửa tay các file proof. Chỉ đánh dấu hoàn thành những bước đã thực hiện thật.

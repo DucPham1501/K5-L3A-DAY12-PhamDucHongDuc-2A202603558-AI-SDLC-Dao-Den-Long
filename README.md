@@ -1,6 +1,6 @@
 # Đảo Đèn Lồng · v1.0.0
 
-> 🎬 **Video demo:** đính kèm ở [GitHub Release v1.0.0](https://github.com/DucPham1501/K5-L3A-DAY12-PhamDucHongDuc-2A202603558-AI-SDLC-Dao-Den-Long/releases/tag/v1.0.0) (`demo.mp4`, dưới 5 phút).
+> 🎬 **Video demo:** [demo.mp4](docs/demo/demo.mp4) — 3 phút 41,5 giây, chơi thật các Đêm, chạy kiểm chứng và benchmark.
 > 📦 **Bản chạy được:** `dao-den-long-v1.0.0.zip` trong cùng Release. Chỉ cần Node.js 20+, không cần `npm install`.
 
 Game 3D góc nhìn thứ ba chạy trên trình duyệt. Bạn cùng Mây, người giữ đèn đội nón lá, gom đom đóm, thắp và châm dầu cho đèn lồng, đẩy lùi Bóng Mực và giữ đủ đèn sáng tới bình minh qua ba hòn đảo. **Phase 4 · Ticket-04 · Test Contract v1.3.**
@@ -32,6 +32,8 @@ Mở **http://127.0.0.1:4173**. `npm start` chạy `node scripts/serve.mjs` (đ�
 Từ bản Release: giải nén `dao-den-long-v1.0.0.zip`, rồi chạy `node scripts/serve.mjs` (hoặc `start.cmd` / `sh start.sh`).
 
 ## Điều khiển (đổi được trong Cài đặt)
+
+Menu có **Chọn level** để bắt đầu trực tiếp ở Đêm 1 (Đảo Bến), Đêm 2 (Đảo Cau) hoặc Đêm 3 (Đảo Chuông), rồi tiếp tục tới Đêm 3. Mỗi lượt chọn đặt lại điểm; chỉ các Đêm thực sự thắng trong lượt mới được tính điểm và bảng xếp hạng. **Bắt đầu hành trình** vẫn bắt đầu từ Đêm 1.
 
 | Phím mặc định | Hành động |
 |---|---|

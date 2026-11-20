@@ -1,6 +1,6 @@
 {
   "passed": true,
-  "generated_at": "2026-11-20T10:49:47.326Z",
+  "generated_at": "2026-11-20T16:42:23.570Z",
   "browser": "157.0.4341.60",
   "cpu": "AMD Ryzen 7 6800H with Radeon Graphics         ",
   "viewport": "1280x720",
@@ -24,25 +24,25 @@
   "fps": [
     {
       "night": 1,
-      "fps": 165.08774033657107,
+      "fps": 165.02177648100712,
       "frames": 413,
-      "elapsed_ms": 2501.7000000000007,
+      "elapsed_ms": 2502.7000000059597,
       "shades": 2,
       "draw_calls": 39
     },
     {
       "night": 2,
-      "fps": 165.10753977769988,
+      "fps": 164.9822234650262,
       "frames": 413,
-      "elapsed_ms": 2501.4000000003725,
+      "elapsed_ms": 2503.2999999999993,
       "shades": 2,
       "draw_calls": 40
     },
     {
       "night": 3,
-      "fps": 165.00199760290113,
+      "fps": 164.97563313893107,
       "frames": 413,
-      "elapsed_ms": 2502.999999999627,
+      "elapsed_ms": 2503.3999999999996,
       "shades": 2,
       "draw_calls": 43
     }

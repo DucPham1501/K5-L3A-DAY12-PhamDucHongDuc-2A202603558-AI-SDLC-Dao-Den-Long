@@ -1,0 +1,87 @@
+HƯỚNG DẪN CHẠY LỆNH KHI QUAY VIDEO ĐẢO ĐÈN LỒNG
+================================================
+Dùng PowerShell. Chạy từng lệnh, đợi xong rồi chạy lệnh tiếp theo.
+Chỉ sao chép dòng lệnh, không sao chép phần giải thích.
+Video cuối: demo.mp4, dưới 5 phút.
+
+1. CHUẨN BỊ TRƯỚC KHI BẤM QUAY — TERMINAL 1
+
+Set-Location -LiteralPath 'D:\AIThucChien\LAB12\K5-L3A-DAY12-PhamDucHongDuc-2A202603558-AI-SDLC-Dao-Den-Long'
+node --version
+npm ci
+npm run build
+npm start
+
+Node.js phải từ 20 trở lên. Giữ terminal này chạy server.
+Mở trình duyệt tại: http://127.0.0.1:4173
+Không chạy các lệnh tiếp theo trong terminal đang chạy server.
+
+2. CHUẨN BỊ TERMINAL 2 — TRƯỚC KHI BẤM QUAY
+
+Mở thêm một tab PowerShell, rồi chạy:
+
+Set-Location -LiteralPath 'D:\AIThucChien\LAB12\K5-L3A-DAY12-PhamDucHongDuc-2A202603558-AI-SDLC-Dao-Den-Long'
+
+3. BẮT ĐẦU QUAY — CHƠI GAME KHOẢNG 1–2 PHÚT
+
+Nhấn Win + Shift + R, chọn vùng quay và bấm Start.
+Hiện menu game, vào chơi, di chuyển, nhảy, lướt, gom đom đóm.
+Đến gần đèn, nhấn E để tương tác khi đủ đom đóm.
+Mở Cài đặt để giới thiệu đổi phím, chữ lớn và giảm chuyển động.
+Không cần chơi thắng cả ba đêm trong video.
+
+4. KIỂM CHỨNG — TERMINAL 2
+
+npm run verify
+
+Đợi hoàn tất. Dừng vài giây ở kết quả để người xem đọc.
+Nếu báo lỗi, xử lý và quay lại bản cuối; không nói đạt khi lệnh thất bại.
+Lệnh verify tự sinh lại bằng chứng Phase 4, không sửa tay các file proof.
+
+5. CHẠY HEADLESS VÀ ĐỌC KẾT QUẢ — TERMINAL 2
+
+Lưu đầu ra vào thư mục tạm để không ghi đè proof đã có:
+
+node src/headless.mjs --seed 12 --night 2 --ticks 120 --out "$env:TEMP\dao-den-long-video-headless.jsonl"
+Get-Content -LiteralPath "$env:TEMP\dao-den-long-video-headless.jsonl" -Tail 5
+
+Lưu ý: CLI bắt buộc có --out. Chạy xong xem bản ghi cuối trong JSONL.
+
+6. ĐO HIỆU NĂNG THẬT — TERMINAL 2
+
+npm run bench
+
+Giữ cửa sổ benchmark hiển thị trong lúc đo (30 giây và thời gian khởi động).
+Đợi lệnh hoàn tất rồi đọc kết quả:
+
+Get-Content bench.json
+
+7. CHẠY SOAK VÀ ĐỌC KẾT QUẢ — TERMINAL 2
+
+npm run soak
+Get-Content soak.json
+
+Bench và soak ghi lại bench.json, soak.json bằng kết quả lần chạy hiện tại.
+Giới thiệu đây là số đo trên máy của bạn; giảng viên sẽ đo lại trên máy chấm.
+
+8. HIỆN TAG VÀ LỊCH SỬ GIT — TERMINAL 2
+
+git -c safe.directory=D:/AIThucChien/LAB12/K5-L3A-DAY12-PhamDucHongDuc-2A202603558-AI-SDLC-Dao-Den-Long tag --list
+git -c safe.directory=D:/AIThucChien/LAB12/K5-L3A-DAY12-PhamDucHongDuc-2A202603558-AI-SDLC-Dao-Den-Long --no-pager log --oneline --decorate -8
+
+Sau đó mở sẵn trong trình soạn thảo và lướt nhanh:
+- AGENTS.md: quy tắc cho AI và lệnh kiểm chứng.
+- docs/proof/: bằng chứng riêng của bốn phase.
+- docs/notes/retro.md: bài học, lỗi AI, token ước tính.
+
+9. DỪNG QUAY VÀ LƯU VIDEO
+
+Bấm Stop trên thanh quay, lưu tên demo.mp4.
+Xem lại để bảo đảm dưới 5 phút, chữ đọc được, không lộ thông tin riêng tư.
+Nếu quá dài, rút ngắn phần giới thiệu/chơi và khoảng chờ; giữ rõ kết quả thật.
+Đính kèm video vào GitHub Release v1.0.0 và kiểm tra link đầu README.
+Việc upload thực hiện theo hạn nộp/thông báo của Coach.
+
+10. TẮT SERVER SAU KHI XONG
+
+Quay về terminal 1, nhấn Ctrl + C.

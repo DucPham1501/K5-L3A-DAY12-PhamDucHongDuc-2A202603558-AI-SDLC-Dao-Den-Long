@@ -25,10 +25,14 @@ try{
  // ---- Regression: three maps, movement, pause, FPS; Phase 4 shade indicator on Night 1 ----
  for(let night=1;night<=3;night++){
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
-  if(night>1)await page.route('**/campaign.mjs',async route=>{const response=await route.fetch();const body=(await response.text()).replace('this.night=1;',`this.night=${night};`);await route.fulfill({response,body});});
   await page.goto(URL_,{waitUntil:'networkidle'});await page.waitForFunction(()=>window.lanternGame);
   if(night===1){await page.screenshot({path:`${dir}/menu.png`});assert.deepEqual(await smallText(page,18),[],'menu text below 18px');}
-  await begin(page,night);await page.waitForFunction(()=>window.lanternGame.snapshot().sim_tick>=3);
+  await page.getByRole('button',{name:'Chọn level',exact:true}).click();
+  assert.deepEqual(await smallText(page,18),[],'level selector text below 18px');
+  await page.getByRole('button',{name:new RegExp(`^Level ${night} ·`)}).click();
+  assert.deepEqual(await page.evaluate(()=>window.lanternGame.campaign()),{night,total:0,scores:[0,0,0],nights_won:0});
+  assert.equal(await page.evaluate(()=>window.lanternGame.snapshot().sim_tick),0,'level intro must not advance gameplay');
+  await page.getByRole('button',{name:`Vào Đêm ${night}`}).click();await page.waitForFunction(()=>window.lanternGame.snapshot().sim_tick>=3);
   const initial=await page.evaluate(()=>window.lanternGame.snapshot());assert.equal(initial.night,night);
   await page.keyboard.down('KeyD');await page.waitForTimeout(400);await page.keyboard.up('KeyD');const moved=await page.evaluate(()=>window.lanternGame.snapshot());assert.ok(moved.player.pos[0]>initial.player.pos[0]);
   await page.keyboard.press('ShiftLeft');await page.waitForTimeout(100);await page.keyboard.down('Space');await page.waitForTimeout(80);await page.keyboard.up('Space');
@@ -91,7 +95,7 @@ try{
  await windPage.route('**/src/core/game.mjs',async route=>{const response=await route.fetch();const body=(await response.text()).replace('validateScenario(scenario,tuning,night);','scenario=globalThis.__qaScenario?.(night)??scenario;validateScenario(scenario,tuning,night);');await route.fulfill({response,body});});
  await windPage.route('**/campaign.mjs',async route=>{const response=await route.fetch();const body=(await response.text()).replace('this.night=1;','this.night=3;');await route.fulfill({response,body});});
  await windPage.goto(URL_,{waitUntil:'networkidle'});await begin(windPage,3);await windPage.waitForFunction(()=>window.lanternGame.snapshot().sim_tick>=1685,null,{timeout:60000});
- assert.ok(await windPage.evaluate(()=>window.lanternGame.captions().some(c=>c.text.startsWith('Gió mạnh sắp thổi'))),'missing wind caption');assert.match(await windPage.locator('#wind-status').textContent(),/gió mạnh sắp tới/);await windPage.screenshot({path:`${dir}/wind-warning.png`});await windPage.close();
+ assert.ok(await windPage.evaluate(()=>window.lanternGame.captions().some(c=>c.text.startsWith('Gió mạnh sắp thổi'))),'missing wind caption');await windPage.waitForFunction(()=>document.querySelector('#wind-status').textContent.includes('gió mạnh sắp tới'));assert.match(await windPage.locator('#wind-status').textContent(),/gió mạnh sắp tới/);await windPage.screenshot({path:`${dir}/wind-warning.png`});await windPage.close();
  checks.push('Night 3 (no enemies fixture) at sim_tick 1680: caption "Gió mạnh sắp thổi" + HUD wind status');
  // ---- Dawn chain (Phase 3) + leaderboard entry after Bình Minh ----
  const chain=await fixture(context,`night=>({time_left_s:.1,random_motes:false,random_shades:false,random_drifters:false,wind_enabled:false,lanterns:Array.from({length:night+4},(_,i)=>({id:'L'+(i+1),lit:true}))})`);
