@@ -1,0 +1,6 @@
+{
+  "random_motes": false,
+  "random_shades": false,
+  "motes": [],
+  "shades": [{ "id": "S-contact", "pos": [0, 0, 0] }]
+}

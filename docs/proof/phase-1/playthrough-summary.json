@@ -1,0 +1,31 @@
+{
+  "seed": 12,
+  "description": "Automated controller; normal initial world, no scenario overrides or state mutations",
+  "type": "end",
+  "ticks": 1305,
+  "state": "won",
+  "score": 1548,
+  "lanterns": [
+    {
+      "id": "L1",
+      "lit": true
+    },
+    {
+      "id": "L2",
+      "lit": true
+    },
+    {
+      "id": "L3",
+      "lit": true
+    },
+    {
+      "id": "L4",
+      "lit": true
+    },
+    {
+      "id": "L5",
+      "lit": true
+    }
+  ],
+  "flames": 3
+}

@@ -1,0 +1,154 @@
+{
+  "passed": true,
+  "generated_at": "2026-11-20T09:00:18.895Z",
+  "node": "v20.17.0",
+  "platform": "win32",
+  "arch": "x64",
+  "cpu": "AMD Ryzen 7 6800H with Radeon Graphics         ",
+  "determinism": {
+    "identical": true,
+    "sha256": "821523a788b6be2e6cb85f3a336642755a1d89720b37bfb7c3ac027e9198a302"
+  },
+  "source_sha256": {
+    "game.contract.json": "ce9f2534450ca8182626d74bde2248516f145559b5869342140af1ddb46b2bb0",
+    "src/core/game.mjs": "873db7001e1d61a679c74dfa20973e9939059d7a3659ff4333eefb3b1ac08ef8",
+    "src/core/validate.mjs": "32c7339d515516ace4683889d9fc487a97e8ab10332e164589c513c0df458baa",
+    "src/headless.mjs": "ce48a86d7c00ce3a3904c806696cb9db818aaace928b4122ae87a18aeae218be",
+    "web/main.mjs": "3445a6ac5c278ecc80e63ee4b3b182b720366745a9c2079297edd49af6770c51",
+    "web/style.css": "938074fde4b44c113425b429a131ebc64cb2a9e03d71cc1f87e113a94a80f3b5",
+    "index.html": "d65af14580916d7bd13b3da6175f03d6fbc7e7e271f93a9b2c018aaee9f084d4"
+  },
+  "browser_visual_check": "Separate browser-qa.json and screenshots; not executed by this script",
+  "steps": [
+    {
+      "command": [
+        "node",
+        "--test"
+      ],
+      "exit_code": 0,
+      "duration_ms": 659,
+      "stdout": "TAP version 13\n# Subtest: tick 0: setup has no events/score; lantern patches preserve five lanterns\nok 1 - tick 0: setup has no events/score; lantern patches preserve five lanterns\n  ---\n  duration_ms: 5.9736\n  ...\n# Subtest: fixed speed, persistent input and exact time model\nok 2 - fixed speed, persistent input and exact time model\n  ---\n  duration_ms: 4.2543\n  ...\n# Subtest: diagonal movement is normalized\nok 3 - diagonal movement is normalized\n  ---\n  duration_ms: 0.5396\n  ...\n# Subtest: camera-relative formula rotates +Z to +X at 90 degrees\nok 4 - camera-relative formula rotates +Z to +X at 90 degrees\n  ---\n  duration_ms: 0.4923\n  ...\n# Subtest: jump uses a rising edge, lands without auto-jumping while held\nok 5 - jump uses a rising edge, lands without auto-jumping while held\n  ---\n  duration_ms: 1.1497\n  ...\n# Subtest: pickup uses XZ distance even during jump; inclusive boundary\nok 6 - pickup uses XZ distance even during jump; inclusive boundary\n  ---\n  duration_ms: 0.4056\n  ...\n# Subtest: pickup stops at capacity and does not consume excess motes\nok 7 - pickup stops at capacity and does not consume excess motes\n  ---\n  duration_ms: 0.2864\n  ...\n# Subtest: deposit at exact interaction boundary, partial then full, preserve overflow\nok 8 - deposit at exact interaction boundary, partial then full, preserve overflow\n  ---\n  duration_ms: 0.6517\n  ...\n# Subtest: deposit outside radius does nothing\nok 9 - deposit outside radius does nothing\n  ---\n  duration_ms: 0.5426\n  ...\n# Subtest: nearest unlit lantern is chosen when interaction ranges overlap\nok 10 - nearest unlit lantern is chosen when interaction ranges overlap\n  ---\n  duration_ms: 0.6807\n  ...\n# Subtest: pulse includes exact radius, pushes, stuns and scores by affected shades\nok 11 - pulse includes exact radius, pushes, stuns and scores by affected shades\n  ---\n  duration_ms: 0.611\n  ...\n# Subtest: pulse without resources does not fire; holding the button never retries\nok 12 - pulse without resources does not fire; holding the button never retries\n  ---\n  duration_ms: 0.2833\n  ...\n# Subtest: pulse cooldown prevents rapid reactivation but allows action after expiry\nok 13 - pulse cooldown prevents rapid reactivation but allows action after expiry\n  ---\n  duration_ms: 0.8647\n  ...\n# Subtest: stun prevents motion and contact damage; chase resumes at expiry\nok 14 - stun prevents motion and contact damage; chase resumes at expiry\n  ---\n  duration_ms: 1.9295\n  ...\n# Subtest: shade chases at declared speed\nok 15 - shade chases at declared speed\n  ---\n  duration_ms: 1.1019\n  ...\n# Subtest: contact loses one flame; overlapping shades respect shared invulnerability\nok 16 - contact loses one flame; overlapping shades respect shared invulnerability\n  ---\n  duration_ms: 1.1751\n  ...\n# Subtest: lit lantern safe zone excludes shades and prevents damage at boundary\nok 17 - lit lantern safe zone excludes shades and prevents damage at boundary\n  ---\n  duration_ms: 1.697\n  ...\n# Subtest: hit drop ratio is zero and inventory is retained\nok 18 - hit drop ratio is zero and inventory is retained\n  ---\n  duration_ms: 0.4588\n  ...\n# Subtest: zero flames ends with no_flames once and simulation freezes\nok 19 - zero flames ends with no_flames once and simulation freezes\n  ---\n  duration_ms: 0.7143\n  ...\n# Subtest: dawn ends at exact number of steps\nok 20 - dawn ends at exact number of steps\n  ---\n  duration_ms: 1.1266\n  ...\n# Subtest: last lantern wins, with declared bonuses; scenario-lit lamps award nothing\nok 21 - last lantern wins, with declared bonuses; scenario-lit lamps award nothing\n  ---\n  duration_ms: 0.3377\n  ...\n# Subtest: all-lit scenario stays playing at snapshot 0, then resolves without lighting points\nok 22 - all-lit scenario stays playing at snapshot 0, then resolves without lighting points\n  ---\n  duration_ms: 0.3863\n  ...\n# Subtest: scenario arrays replace lists; random flags prevent all later spawning\nok 23 - scenario arrays replace lists; random flags prevent all later spawning\n  ---\n  duration_ms: 13.3936\n  ...\n# Subtest: default random world spawns deterministic shades with events after tick 0\nok 24 - default random world spawns deterministic shades with events after tick 0\n  ---\n  duration_ms: 30.1945\n  ...\n# Subtest: same seed, scenario, inputs gives byte-identical snapshots and IDs\nok 25 - same seed, scenario, inputs gives byte-identical snapshots and IDs\n  ---\n  duration_ms: 14.0603\n  ...\n# Subtest: explicit shade IDs cannot collide with automatic IDs\nok 26 - explicit shade IDs cannot collide with automatic IDs\n  ---\n  duration_ms: 0.3368\n  ...\n# Subtest: island boundary blocks outward motion without fall penalties\nok 27 - island boundary blocks outward motion without fall penalties\n  ---\n  duration_ms: 0.6095\n  ...\n# Subtest: snapshots round all coordinates to three decimals\nok 28 - snapshots round all coordinates to three decimals\n  ---\n  duration_ms: 0.2384\n  ...\n# Subtest: invalid frame/scenario formats rejected with DataError\nok 29 - invalid frame/scenario formats rejected with DataError\n  ---\n  duration_ms: 1.5621\n  ...\n# Subtest: real CLI: no GPU, fixed ticks, events, snapshots and final end record\nok 30 - real CLI: no GPU, fixed ticks, events, snapshots and final end record\n  ---\n  duration_ms: 84.8618\n  ...\n# Subtest: real CLI: invalid JSON and invalid schema return exit 2, errors to stderr\nok 31 - real CLI: invalid JSON and invalid schema return exit 2, errors to stderr\n  ---\n  duration_ms: 139.2469\n  ...\n# Subtest: real CLI: zero ticks produces snapshot 0 then end; unsupported night fails\nok 32 - real CLI: zero ticks produces snapshot 0 then end; unsupported night fails\n  ---\n  duration_ms: 132.6057\n  ...\n1..32\n# tests 32\n# suites 0\n# pass 32\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 589.4459\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/build.mjs"
+      ],
+      "exit_code": 0,
+      "duration_ms": 83,
+      "stdout": "Built dist/: self-contained static web game, no CDN required.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "scripts/playthrough.mjs"
+      ],
+      "exit_code": 0,
+      "duration_ms": 101,
+      "stdout": "{\"type\":\"end\",\"ticks\":1305,\"state\":\"won\",\"score\":1548}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--inputs",
+        "docs/proof/phase-1/playthrough.inputs.json",
+        "--ticks",
+        "18000",
+        "--snapshot-every",
+        "60",
+        "--out",
+        "docs/proof/phase-1/playthrough.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 107,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--ticks",
+        "1200",
+        "--out",
+        "docs/proof/phase-1/replay-a.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 95,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--ticks",
+        "1200",
+        "--out",
+        "docs/proof/phase-1/replay-b.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 92,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/last-lantern.json",
+        "--inputs",
+        "tests/scenarios/last-lantern.inputs.json",
+        "--ticks",
+        "60",
+        "--out",
+        "docs/proof/phase-1/won.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 63,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "node",
+        "src/headless.mjs",
+        "--seed",
+        "12",
+        "--night",
+        "1",
+        "--scenario",
+        "tests/scenarios/contact.json",
+        "--ticks",
+        "600",
+        "--out",
+        "docs/proof/phase-1/lost.jsonl"
+      ],
+      "exit_code": 0,
+      "duration_ms": 69,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

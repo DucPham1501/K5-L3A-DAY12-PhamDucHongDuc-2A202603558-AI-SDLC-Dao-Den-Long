@@ -1,0 +1,24 @@
+{
+  "name": "dao-den-long",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Đảo Đèn Lồng — Phase 1, shared deterministic simulation and 3D web game",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "headless": "node src/headless.mjs",
+    "test": "node --test",
+    "verify": "node scripts/verify.mjs",
+    "test:browser": "node scripts/browser-qa.mjs"
+  },
+  "dependencies": {
+    "three": "0.170.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.56.1"
+  }
+}

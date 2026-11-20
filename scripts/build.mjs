@@ -1,0 +1,12 @@
+import { mkdirSync, copyFileSync, cpSync, existsSync } from 'node:fs';
+const root = new URL('../', import.meta.url);
+const at = p => new URL(p, root);
+if (!existsSync(at('node_modules/three/build/three.module.js'))) throw new Error('Run npm ci first');
+mkdirSync(at('dist/vendor'), { recursive: true });
+copyFileSync(at('index.html'), at('dist/index.html'));
+copyFileSync(at('game.contract.json'), at('dist/game.contract.json'));
+cpSync(at('web'), at('dist/web'), { recursive: true });
+cpSync(at('src/core'), at('dist/src/core'), { recursive: true });
+copyFileSync(at('node_modules/three/build/three.module.js'), at('dist/vendor/three.module.js'));
+copyFileSync(at('node_modules/three/LICENSE'), at('dist/vendor/THREE-LICENSE.txt'));
+console.log('Built dist/: self-contained static web game, no CDN required.');

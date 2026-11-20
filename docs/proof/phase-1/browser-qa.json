@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "generated_at": "2026-11-20T08:32:51.279Z",
+  "browser": "157.0.4341.60",
+  "renderer": "software SwiftShader; not a hardware FPS benchmark",
+  "checks": [
+    "title overlay and WebGL renderer initialized, tick 0",
+    "keyboard movement changes shared simulation position",
+    "Space triggers jump",
+    "pause freezes gameplay ticks",
+    "resume works; HUD, minimap and orbit captured",
+    "help panel works",
+    "compact layout captured at 700×850",
+    "dawn end overlay and restart tested with explicitly shortened 0.1s UI fixture; production tuning unchanged"
+  ],
+  "render": {
+    "calls": 353,
+    "triangles": 21492
+  },
+  "page_errors": [],
+  "failed_requests": []
+}

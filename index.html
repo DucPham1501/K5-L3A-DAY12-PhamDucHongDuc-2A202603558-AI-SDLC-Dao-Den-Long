@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090d1d">
+  <meta name="description" content="Đảo Đèn Lồng — cùng Mây mang ánh sáng trở lại hòn đảo giữa biển mây.">
+  <title>Đảo Đèn Lồng · Đêm 1</title>
+  <link rel="stylesheet" href="/web/style.css">
+  <script type="importmap">{"imports":{"three":"/vendor/three.module.js"}}</script>
+</head>
+<body>
+  <main id="game" aria-label="Đảo Đèn Lồng, game 3D góc nhìn thứ ba"></main>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">✦</span><div><span class="eyebrow">MỘT CHÚT SÁNG, MỘT MIỀN BÌNH YÊN</span><h1>Đảo Đèn Lồng</h1></div></div>
+    <div class="chapter"><span class="moon">☾</span><div><span class="eyebrow">ĐÊM 01</span><strong>Đảo Bến</strong></div><span id="clock">05:00</span></div>
+  </header>
+  <aside class="objective glass"><span class="eyebrow">MANG ÁNH SÁNG TRỞ VỀ</span><h2>Thắp sáng hòn đảo</h2><p>Gom đom đóm, nạp ánh sáng vào 5 đèn lồng.</p><div id="lantern-progress" aria-label="Tiến trình đèn lồng"></div><div class="progress-caption"><span id="lit-count">0 / 5 đèn đã sáng</span><span class="warm">✦</span></div></aside>
+  <aside class="map-panel glass"><div class="map-title"><span class="eyebrow">BẢN ĐỒ ĐẢO</span><span>N</span></div><canvas id="minimap" width="200" height="200" aria-label="Bản đồ vị trí Mây, đèn và Bóng Mực"></canvas><div class="map-legend"><span>● Mây</span><span class="warm">◆ Đèn</span><span class="danger">● Mực</span></div></aside>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="interaction" class="interaction" hidden><kbd>E</kbd><span>Nạp ánh sáng</span></div>
+  <footer class="bottom-ui">
+    <section class="status glass" aria-label="Trạng thái người chơi"><div><span class="eyebrow">NGỌN LỬA CỦA MÂY</span><div id="health" class="health">✦ ✦ ✦</div></div><div class="divider"></div><div class="inventory"><span class="eyebrow">ĐOM ĐÓM</span><strong><span id="carried">0</span><small> / 20</small></strong><div class="meter"><i id="carry-meter"></i></div></div><div class="divider"></div><div><span class="eyebrow">ĐIỂM SỐ</span><strong id="score">0000</strong></div></section>
+    <button id="pulse-button" class="pulse-button" aria-label="Tỏa sáng bằng phím Q"><span class="pulse-icon">☼</span><span><strong>Tỏa sáng <kbd>Q</kbd></strong><small id="pulse-status">Cần 3 đom đóm</small></span></button>
+  </footer>
+  <nav class="controls" aria-label="Điều khiển"><span><kbd>W A S D</kbd> Di chuyển</span><span><kbd>Space</kbd> Nhảy</span><span><kbd>E</kbd> Nạp đèn</span><span><kbd>Q</kbd> Tỏa sáng</span><span><kbd>← →</kbd> Xoay camera</span><button id="help-button">Hướng dẫn <kbd>H</kbd></button><button id="pause-button">Tạm dừng <kbd>Esc</kbd></button></nav>
+  <div id="overlay" class="overlay">
+    <section class="modal" aria-labelledby="modal-title"><div class="modal-emblem">☾</div><span class="eyebrow" id="modal-kicker">CHUYỆN KỂ TỪ BIỂN MÂY</span><h2 id="modal-title">Đêm nay,<br>mình thắp lại những vì sao.</h2><p id="modal-copy">Sương đen đã phủ kín Đảo Bến. Cùng Mây gom những đốm sáng nhỏ, thắp lại năm ngọn đèn và đưa bình yên trở về.</p><div id="modal-details" class="modal-details"><span><b>01</b> Đi theo những đom đóm vàng.</span><span><b>02</b> Đến gần đèn và nhấn <kbd>E</kbd> để nạp.</span><span><b>03</b> Nhấn <kbd>Q</kbd> xua Bóng Mực. Đèn sáng là nơi an toàn.</span></div><button id="primary-button" class="primary">Bắt đầu hành trình <span>✦</span></button><p class="modal-note">WASD di chuyển · Space nhảy · Chuột kéo hoặc ← → xoay camera</p></section>
+  </div>
+  <script type="module" src="/web/main.mjs"></script>
+</body>
+</html>
